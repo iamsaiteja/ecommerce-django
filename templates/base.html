@@ -33,11 +33,12 @@
             </a>
             {% if user.is_authenticated %}
                 <div class="relative group">
-                    <button class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
+                    <button onclick="document.getElementById('userDropdown').classList.toggle('hidden')"
+                            class="flex items-center gap-2 text-gray-700 hover:text-blue-600">
                         <i class="fas fa-user-circle text-xl"></i>
                         <span class="hidden md:block">{{ user.username }}</span>
                     </button>
-                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border hidden group-hover:block">
+                    <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border hidden">
                         <a href="/users/profile/" class="block px-4 py-2 hover:bg-gray-50">👤 Profile</a>
                         <a href="/orders/" class="block px-4 py-2 hover:bg-gray-50">📦 My Orders</a>
                         {% if user.role == 'seller' %}

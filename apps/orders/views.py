@@ -52,11 +52,15 @@ def place_order(request):
 
     # Create Razorpay order
     client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-    rz_order = client.order.create({
+    try:
+        rz_order = client.order.create({
         'amount': total_paise,
         'currency': 'INR',
         'payment_capture': '1',
-    })
+        })
+    except Exception as e:
+        messages.error(request, 'Payment setup failed. Check Razorpay keys!')
+        return redirect('cart')
 
     order = Order.objects.create(
         user=request.user,
