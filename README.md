@@ -1,4 +1,4 @@
-# 🛍️ ShopIndia - Django E-Commerce Website
+# 🛍️ SoleMate - Django E-Commerce Website
 
 ## Features
 - ✅ Multi-seller marketplace
