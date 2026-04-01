@@ -1,29 +1,13 @@
 from django.db import models
-from apps.users.models import User
+from django.conf import settings
 from apps.products.models import Product
 
-
-class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Cart of {self.user.email}"
-
-    def total(self):
-        return sum(item.subtotal() for item in self.items.all())
-
-    def item_count(self):
-        return self.items.count()
-
+User = settings.AUTH_USER_MODEL
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # ← null=True 
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-
-    def subtotal(self):
-        return self.product.get_price() * self.quantity
+    quantity = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        return self.product.name

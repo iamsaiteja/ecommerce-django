@@ -1,133 +1,118 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
 import razorpay
-import json
-
+from django.conf import settings
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from .models import Order, OrderItem
-from apps.cart.models import Cart
-from apps.users.models import Address
-from apps.coupons.models import Coupon
+from apps.cart.models import CartItem
 
+client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-@login_required
-def checkout_view(request):
-    cart, _ = Cart.objects.get_or_create(user=request.user)
-    if not cart.items.exists():
-        messages.warning(request, 'Your cart is empty!')
-        return redirect('cart')
-    addresses = request.user.addresses.all()
-    return render(request, 'orders/checkout.html', {'cart': cart, 'addresses': addresses})
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_order(request):
+    cart_items = CartItem.objects.filter(user=request.user).select_related('product')
+    if not cart_items.exists():
+        return Response({'error': 'Cart is empty'}, status=400)
 
+    subtotal = sum(item.product.get_price() * item.quantity for item in cart_items)
+    amount_paise = int(subtotal * 100)
 
-@login_required
-def place_order(request):
-    if request.method != 'POST':
-        return redirect('checkout')
-
-    cart, _ = Cart.objects.get_or_create(user=request.user)
-    if not cart.items.exists():
-        return redirect('cart')
-
-    address_id = request.POST.get('address_id')
-    address = get_object_or_404(Address, id=address_id, user=request.user)
-
-    subtotal = cart.total()
-    discount = 0
-    coupon_code = ''
-    coupon_id = request.session.get('coupon_id')
-    if coupon_id:
-        try:
-            coupon = Coupon.objects.get(id=coupon_id, is_active=True)
-            discount = coupon.get_discount(subtotal)
-            coupon_code = coupon.code
-        except Coupon.DoesNotExist:
-            pass
-
-    total = subtotal - discount
-    total_paise = int(total * 100)
-
-    # Create Razorpay order
-    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-    try:
-        rz_order = client.order.create({
-        'amount': total_paise,
+    rz_order = client.order.create({
+        'amount': amount_paise,
         'currency': 'INR',
-        'payment_capture': '1',
-        })
-    except Exception as e:
-        messages.error(request, 'Payment setup failed. Check Razorpay keys!')
-        return redirect('cart')
+        'payment_capture': 1
+    })
 
     order = Order.objects.create(
         user=request.user,
-        address=address,
         subtotal=subtotal,
-        discount=discount,
-        total=total,
-        coupon_code=coupon_code,
-        razorpay_order_id=rz_order['id'],
+        total=subtotal,
+        razorpay_order_id=rz_order['id']
     )
 
-    for item in cart.items.all():
+    for item in cart_items:
         OrderItem.objects.create(
             order=order,
             product=item.product,
             seller=item.product.seller,
             product_name=item.product.name,
             price=item.product.get_price(),
-            quantity=item.quantity,
+            quantity=item.quantity
         )
-        # Reduce stock
-        item.product.stock -= item.quantity
-        item.product.save()
 
-    cart.items.all().delete()
-    if 'coupon_id' in request.session:
-        del request.session['coupon_id']
-
-    return render(request, 'orders/payment.html', {
-        'order': order,
-        'razorpay_key': settings.RAZORPAY_KEY_ID,
-        'amount': total_paise,
+    return Response({
+        'order_id': order.id,
+        'order_number': order.order_number,
+        'razorpay_order_id': rz_order['id'],
+        'amount': amount_paise,
         'currency': 'INR',
+        'key': settings.RAZORPAY_KEY_ID,
+        'user_name': request.user.get_full_name() or request.user.username,
+        'user_email': request.user.email,
     })
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_payment(request):
+    try:
+        client.utility.verify_payment_signature({
+            'razorpay_order_id': request.data.get('razorpay_order_id'),
+            'razorpay_payment_id': request.data.get('razorpay_payment_id'),
+            'razorpay_signature': request.data.get('razorpay_signature'),
+        })
+        order = Order.objects.get(
+            razorpay_order_id=request.data.get('razorpay_order_id'),
+            user=request.user
+        )
+        order.payment_status = 'paid'
+        order.status = 'confirmed'
+        order.razorpay_payment_id = request.data.get('razorpay_payment_id')
+        order.save()
+        CartItem.objects.filter(user=request.user).delete()
+        return Response({'message': 'Payment successful!', 'order_number': order.order_number})
+    except Exception as e:
+        return Response({'error': 'Payment verification failed'}, status=400)
 
-@csrf_exempt
-def payment_callback(request):
-    if request.method == 'POST':
-        data = request.POST
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        try:
-            client.utility.verify_payment_signature({
-                'razorpay_order_id': data['razorpay_order_id'],
-                'razorpay_payment_id': data['razorpay_payment_id'],
-                'razorpay_signature': data['razorpay_signature'],
-            })
-            order = Order.objects.get(razorpay_order_id=data['razorpay_order_id'])
-            order.razorpay_payment_id = data['razorpay_payment_id']
-            order.payment_status = 'paid'
-            order.status = 'confirmed'
-            order.save()
-            messages.success(request, f'Payment successful! Order #{order.order_number} placed.')
-            return redirect('order_detail', pk=order.pk)
-        except Exception as e:
-            messages.error(request, 'Payment verification failed!')
-            return redirect('cart')
-    return HttpResponse(status=400)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def order_history(request):
+    orders = Order.objects.filter(user=request.user).prefetch_related('items').order_by('-created_at')
+    data = []
+    for order in orders:
+        data.append({
+            'id': order.id,
+            'order_number': order.order_number,
+            'status': order.status,
+            'payment_status': order.payment_status,
+            'total': float(order.total),
+            'created_at': order.created_at.strftime('%d %b %Y'),
+            'items': [
+                {
+                    'product_name': i.product_name,
+                    'price': float(i.price),
+                    'quantity': i.quantity,
+                    'subtotal': float(i.subtotal())
+                } for i in order.items.all()
+            ]
+        })
+    return Response(data)
 
-
-@login_required
-def order_list(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'orders/list.html', {'orders': orders})
-
-
-@login_required
-def order_detail(request, pk):
-    order = get_object_or_404(Order, pk=pk, user=request.user)
-    return render(request, 'orders/detail.html', {'order': order})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def seller_dashboard(request):
+    seller_items = OrderItem.objects.filter(seller=request.user).select_related('order').order_by('-order__created_at')
+    data = []
+    for item in seller_items:
+        data.append({
+            'order_number': item.order.order_number,
+            'product_name': item.product_name,
+            'quantity': item.quantity,
+            'price': float(item.price),
+            'subtotal': float(item.subtotal()),
+            'order_status': item.order.status,
+            'payment_status': item.order.payment_status,
+            'date': item.order.created_at.strftime('%d %b %Y'),
+        })
+    total_revenue = sum(float(i.subtotal()) for i in seller_items if i.order.payment_status == 'paid')
+    return Response({'orders': data, 'total_revenue': total_revenue})
