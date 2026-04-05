@@ -1,18 +1,38 @@
-from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Product
 
-def product_list_api(request):
-    
-    products = Product.objects.all()
-
+@api_view(['GET'])
+def product_list(request):
+    products = Product.objects.filter(is_active=True).select_related('category')
     data = []
-
     for p in products:
         data.append({
-            "id": p.id,
-            "name": p.name,
-            "price": p.price,
-            "image": p.image.url if p.image else ""
+            'id': p.id,
+            'name': p.name,
+            'description': p.description,
+            'price': str(p.price),
+            'stock': p.stock,
+            'category': p.category.name if p.category else None,
+            'image': request.build_absolute_uri(p.image.url) if p.image else None,
         })
+    return Response(data)
 
-    return JsonResponse(data, safe=False)
+@api_view(['GET'])
+def product_detail(request, pk):
+    try:
+        p = Product.objects.get(id=pk, is_active=True)
+        reviews = [{'user': r.user.username, 'rating': r.rating, 'comment': r.comment} for r in p.reviews.all()]
+        data = {
+            'id': p.id,
+            'name': p.name,
+            'description': p.description,
+            'price': str(p.price),
+            'stock': p.stock,
+            'category': p.category.name if p.category else None,
+            'image': request.build_absolute_uri(p.image.url) if p.image else None,
+            'reviews': reviews,
+        }
+        return Response(data)
+    except Product.DoesNotExist:
+        return Response({'error': 'Not found'}, status=404)

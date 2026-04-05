@@ -4,115 +4,113 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Order, OrderItem
-from apps.cart.models import CartItem
-
-client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+from apps.cart.models import Cart
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_order(request):
-    cart_items = CartItem.objects.filter(user=request.user).select_related('product')
-    if not cart_items.exists():
-        return Response({'error': 'Cart is empty'}, status=400)
+    shipping_address = request.data.get('shipping_address', '')
+    phone = request.data.get('phone', '')
 
-    subtotal = sum(item.product.get_price() * item.quantity for item in cart_items)
-    amount_paise = int(subtotal * 100)
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_items = list(cart.items.select_related('product').all())
 
-    rz_order = client.order.create({
-        'amount': amount_paise,
-        'currency': 'INR',
-        'payment_capture': 1
-    })
+        if not cart_items:
+            return Response({'error': 'Cart is empty'}, status=400)
 
-    order = Order.objects.create(
-        user=request.user,
-        subtotal=subtotal,
-        total=subtotal,
-        razorpay_order_id=rz_order['id']
-    )
+        total = sum(item.get_subtotal() for item in cart_items)
 
-    for item in cart_items:
-        OrderItem.objects.create(
-            order=order,
-            product=item.product,
-            seller=item.product.seller,
-            product_name=item.product.name,
-            price=item.product.get_price(),
-            quantity=item.quantity
+        # Create Razorpay order
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        razorpay_order = client.order.create({
+            'amount': int(total * 100),
+            'currency': 'INR',
+            'payment_capture': 1,
+        })
+
+        # Save order to DB
+        order = Order.objects.create(
+            user=request.user,
+            total_amount=total,
+            shipping_address=shipping_address,
+            phone=phone,
+            razorpay_order_id=razorpay_order['id'],
         )
 
-    return Response({
-        'order_id': order.id,
-        'order_number': order.order_number,
-        'razorpay_order_id': rz_order['id'],
-        'amount': amount_paise,
-        'currency': 'INR',
-        'key': settings.RAZORPAY_KEY_ID,
-        'user_name': request.user.get_full_name() or request.user.username,
-        'user_email': request.user.email,
-    })
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                product_name=item.product.name,
+                quantity=item.quantity,
+                price=item.product.price,
+            )
+
+        # Clear cart after order created
+        cart.items.all().delete()
+
+        return Response({
+            'order_id': order.id,
+            'razorpay_order_id': razorpay_order['id'],
+            'amount': int(total * 100),
+            'currency': 'INR',
+            'key': settings.RAZORPAY_KEY_ID,
+            'name': request.user.get_full_name() or request.user.username,
+            'email': request.user.email,
+        })
+
+    except Cart.DoesNotExist:
+        return Response({'error': 'Cart not found'}, status=404)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_payment(request):
+    razorpay_payment_id = request.data.get('razorpay_payment_id')
+    razorpay_order_id = request.data.get('razorpay_order_id')
+    razorpay_signature = request.data.get('razorpay_signature')
+
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
     try:
         client.utility.verify_payment_signature({
-            'razorpay_order_id': request.data.get('razorpay_order_id'),
-            'razorpay_payment_id': request.data.get('razorpay_payment_id'),
-            'razorpay_signature': request.data.get('razorpay_signature'),
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': razorpay_payment_id,
+            'razorpay_signature': razorpay_signature,
         })
-        order = Order.objects.get(
-            razorpay_order_id=request.data.get('razorpay_order_id'),
-            user=request.user
-        )
+        order = Order.objects.get(razorpay_order_id=razorpay_order_id, user=request.user)
+        order.razorpay_payment_id = razorpay_payment_id
         order.payment_status = 'paid'
-        order.status = 'confirmed'
-        order.razorpay_payment_id = request.data.get('razorpay_payment_id')
+        order.status = 'processing'
         order.save()
-        CartItem.objects.filter(user=request.user).delete()
-        return Response({'message': 'Payment successful!', 'order_number': order.order_number})
-    except Exception as e:
+        return Response({'message': 'Payment successful!', 'order_id': order.id})
+    except Exception:
         return Response({'error': 'Payment verification failed'}, status=400)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def order_history(request):
-    orders = Order.objects.filter(user=request.user).prefetch_related('items').order_by('-created_at')
+def get_orders(request):
+    orders = Order.objects.filter(user=request.user).prefetch_related('items')
     data = []
     for order in orders:
         data.append({
             'id': order.id,
-            'order_number': order.order_number,
+            'total_amount': str(order.total_amount),
             'status': order.status,
             'payment_status': order.payment_status,
-            'total': float(order.total),
+            'shipping_address': order.shipping_address,
             'created_at': order.created_at.strftime('%d %b %Y'),
             'items': [
                 {
-                    'product_name': i.product_name,
-                    'price': float(i.price),
-                    'quantity': i.quantity,
-                    'subtotal': float(i.subtotal())
-                } for i in order.items.all()
-            ]
+                    'product_name': item.product_name,
+                    'quantity': item.quantity,
+                    'price': str(item.price),
+                    'subtotal': str(item.get_subtotal()),
+                }
+                for item in order.items.all()
+            ],
         })
     return Response(data)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def seller_dashboard(request):
-    seller_items = OrderItem.objects.filter(seller=request.user).select_related('order').order_by('-order__created_at')
-    data = []
-    for item in seller_items:
-        data.append({
-            'order_number': item.order.order_number,
-            'product_name': item.product_name,
-            'quantity': item.quantity,
-            'price': float(item.price),
-            'subtotal': float(item.subtotal()),
-            'order_status': item.order.status,
-            'payment_status': item.order.payment_status,
-            'date': item.order.created_at.strftime('%d %b %Y'),
-        })
-    total_revenue = sum(float(i.subtotal()) for i in seller_items if i.order.payment_status == 'paid')
-    return Response({'orders': data, 'total_revenue': total_revenue})

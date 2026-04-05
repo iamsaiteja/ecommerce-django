@@ -1,75 +1,141 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import API from '../utils/api';
+
+const STATUS = {
+  pending:    { color: '#e8a83b', bg: 'rgba(232,168,59,0.1)',  label: 'Pending' },
+  processing: { color: '#3b9de8', bg: 'rgba(59,157,232,0.1)',  label: 'Processing' },
+  shipped:    { color: '#a83be8', bg: 'rgba(168,59,232,0.1)',  label: 'Shipped' },
+  delivered:  { color: '#3be87b', bg: 'rgba(59,232,123,0.1)',  label: 'Delivered' },
+  cancelled:  { color: '#e84545', bg: 'rgba(232,69,69,0.1)',   label: 'Cancelled' },
+};
 
 function Orders() {
-  const [orders, setOrders] = useState([])
-  const navigate = useNavigate()
-  const token = localStorage.getItem('access')
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    if (!token) { navigate('/login'); return }
-    fetch("http://127.0.0.1:8000/orders/api/history/", {
-      headers: { "Authorization": `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => setOrders(Array.isArray(data) ? data : []))
-  }, [])
+    API.get('/orders/').then(res => { setOrders(res.data); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const statusColor = { pending: "#f39c12", confirmed: "#27ae60", shipped: "#2980b9", delivered: "#16a085", cancelled: "#e74c3c" }
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'rgba(245,245,245,0.3)', letterSpacing: '1px' }}>LOADING...</p>
+    </div>
+  );
 
   return (
-    <div style={{ padding: "40px", maxWidth: "900px", margin: "0 auto" }}>
-      <h2>My Orders</h2>
-      {orders.length === 0 ? (
-        <p>No orders yet. <span style={{ cursor: "pointer", color: "blue" }} onClick={() => navigate('/')}>Start shopping →</span></p>
-      ) : (
-        orders.map(order => (
-          <div key={order.id} style={{ border: "1px solid #ddd", borderRadius: "10px", padding: "20px", marginBottom: "20px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
-              <div>
-                <h3 style={{ margin: 0 }}>Order #{order.order_number}</h3>
-                <p style={{ color: "#666", margin: "4px 0" }}>{order.created_at}</p>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <span style={{
-                  background: statusColor[order.status] || "#999",
-                  color: "white", padding: "4px 12px", borderRadius: "20px", fontSize: "13px"
-                }}>{order.status.toUpperCase()}</span>
-                <p style={{ margin: "6px 0", color: order.payment_status === 'paid' ? "green" : "orange" }}>
-                  Payment: {order.payment_status}
-                </p>
-              </div>
-            </div>
+    <div style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: '80px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 40px' }}>
 
-            <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
-              <thead>
-                <tr style={{ background: "#f5f5f5" }}>
-                  <th style={th}>Product</th>
-                  <th style={th}>Qty</th>
-                  <th style={th}>Price</th>
-                  <th style={th}>Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.items.map((item, idx) => (
-                  <tr key={idx}>
-                    <td style={td}>{item.product_name}</td>
-                    <td style={td}>{item.quantity}</td>
-                    <td style={td}>₹{item.price}</td>
-                    <td style={td}>₹{item.subtotal}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p style={{ textAlign: "right", fontWeight: "bold", marginTop: "10px" }}>Total: ₹{order.total}</p>
+        <div style={{ marginBottom: '48px' }}>
+          <p style={{ fontSize: '11px', color: '#e8ff3b', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>
+            {orders.length} orders
+          </p>
+          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '60px', letterSpacing: '2px', color: '#f5f5f5' }}>
+            My Orders
+          </h1>
+        </div>
+
+        {orders.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '80px 0', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '80px', color: 'rgba(245,245,245,0.05)', marginBottom: '24px' }}>
+              NO ORDERS YET
+            </div>
+            <Link to="/products" style={{
+              display: 'inline-block', background: '#e8ff3b', color: '#0a0a0a',
+              padding: '14px 36px', borderRadius: '8px',
+              fontSize: '13px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase',
+            }}>Start Shopping</Link>
           </div>
-        ))
-      )}
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {orders.map(order => {
+              const s = STATUS[order.status] || STATUS.pending;
+              const open = expanded === order.id;
+              return (
+                <div key={order.id} style={{
+                  background: '#111', border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '12px', overflow: 'hidden',
+                }}>
+                  <div onClick={() => setExpanded(open ? null : order.id)}
+                    style={{
+                      padding: '24px 28px',
+                      display: 'grid', gridTemplateColumns: '1fr auto auto auto',
+                      gap: '24px', alignItems: 'center', cursor: 'pointer',
+                    }}>
+                    <div>
+                      <p style={{ fontSize: '13px', color: 'rgba(245,245,245,0.35)', marginBottom: '4px' }}>
+                        Order #{String(order.id).padStart(4, '0')} · {order.created_at}
+                      </p>
+                      <p style={{ fontSize: '15px', fontWeight: '500', color: '#f5f5f5' }}>
+                        {order.items.length} item{order.items.length > 1 ? 's' : ''}
+                      </p>
+                    </div>
+
+                    <span style={{
+                      background: s.bg, color: s.color,
+                      fontSize: '11px', fontWeight: '600',
+                      padding: '6px 14px', borderRadius: '100px',
+                      letterSpacing: '0.5px', textTransform: 'uppercase',
+                    }}>{s.label}</span>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontSize: '18px', fontWeight: '600', color: '#f5f5f5' }}>
+                        ₹{parseFloat(order.total_amount).toLocaleString('en-IN')}
+                      </p>
+                      <p style={{
+                        fontSize: '11px', fontWeight: '600',
+                        color: order.payment_status === 'paid' ? '#3be87b' : '#e8a83b',
+                        textTransform: 'uppercase', marginTop: '2px',
+                      }}>{order.payment_status === 'paid' ? '✓ Paid' : 'Pending'}</p>
+                    </div>
+
+                    <span style={{
+                      color: 'rgba(245,245,245,0.25)', fontSize: '18px',
+                      display: 'inline-block',
+                      transition: 'transform 0.2s',
+                      transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}>▾</span>
+                  </div>
+
+                  {open && (
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '24px 28px' }}>
+                      {order.items.map((item, j) => (
+                        <div key={j} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                          <div>
+                            <p style={{ fontSize: '14px', color: '#f5f5f5', marginBottom: '2px' }}>{item.product_name}</p>
+                            <p style={{ fontSize: '12px', color: 'rgba(245,245,245,0.35)' }}>
+                              {item.quantity} × ₹{parseFloat(item.price).toLocaleString('en-IN')}
+                            </p>
+                          </div>
+                          <span style={{ fontSize: '14px', fontWeight: '600', color: '#f5f5f5' }}>
+                            ₹{parseFloat(item.subtotal).toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                      ))}
+                      {order.shipping_address && (
+                        <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '14px 16px', marginTop: '8px' }}>
+                          <p style={{ fontSize: '11px', color: 'rgba(245,245,245,0.3)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>
+                            Delivery Address
+                          </p>
+                          <p style={{ fontSize: '13px', color: 'rgba(245,245,245,0.6)', lineHeight: '1.5' }}>
+                            {order.shipping_address}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }
 
-const th = { padding: "8px 12px", textAlign: "left", borderBottom: "1px solid #ddd" }
-const td = { padding: "8px 12px", borderBottom: "1px solid #eee" }
-
-export default Orders
+export default Orders;
