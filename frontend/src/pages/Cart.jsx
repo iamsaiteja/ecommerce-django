@@ -23,7 +23,7 @@ function Cart() {
   const removeItem = async (id) => { await API.delete(`/cart/remove/${id}/`); fetchCart(); };
   const updateQty = async (id, qty) => {
     if (qty < 1) return removeItem(id);
-    await API.put(`/cart/update/${id}/`, { quantity: qty });
+    await API.patch(`/cart/update/${id}/`, { quantity: qty });
     fetchCart();
   };
 
