@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 🔥 BASE URL (CHANGE ONLY HERE)
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = "http://3.237.9.42";
 
 // ✅ Create axios instance
 const API = axios.create({

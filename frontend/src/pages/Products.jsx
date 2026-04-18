@@ -10,7 +10,7 @@ function Products() {
   const [hoveredBtn, setHoveredBtn] = useState(null);
   const navigate = useNavigate();
 
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = "http://3.237.9.42";
 
   useEffect(() => {
     fetch(`${BASE_URL}/api/products/`)
