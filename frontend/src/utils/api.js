@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const BASE_URL = "https://mae-tube-reproduction-mentor.trycloudflare.com";
+const BASE_URL = "https://solemate.servecounterstrike.com";
 
 
 const API = axios.create({
