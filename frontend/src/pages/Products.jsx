@@ -10,14 +10,12 @@ function Products() {
   const [hoveredBtn, setHoveredBtn] = useState(null);
   const navigate = useNavigate();
 
-  const BASE_URL = "http://3.237.9.42";
-
+  
   useEffect(() => {
-    fetch(`${BASE_URL}/api/products/`)
-      .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(err => console.error("Error fetching products:", err));
-  }, []);
+    API.get('/products/')
+        .then(res => setProducts(res.data))
+        .catch(err => console.error("Error fetching products:", err))
+}, []);
 
   function addToCart(e, productId) {
     e.stopPropagation(); // card click trigger avvakunda
