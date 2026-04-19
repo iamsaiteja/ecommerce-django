@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-// 🔥 BASE URL (CHANGE ONLY HERE)
-const BASE_URL = "http://3.237.9.42";
 
-// ✅ Create axios instance
+const BASE_URL = "https://mae-tube-reproduction-mentor.trycloudflare.com";
+
+
 const API = axios.create({
   baseURL: `${BASE_URL}/api`,
 });
 
-// ✅ Attach access token to every request
+
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('access');
 
@@ -19,14 +19,14 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ Auto refresh token when expired (401)
+
 API.interceptors.response.use(
   (response) => response,
 
   async (error) => {
     const originalRequest = error.config;
 
-    // check if token expired
+    
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
