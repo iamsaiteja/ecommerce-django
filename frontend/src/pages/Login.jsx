@@ -97,6 +97,22 @@ function Login() {
             {loading ? 'Signing in...' : 'Sign In →'}
           </button>
         </form>
+        <a 
+          href="https://solemate.servecounterstrike.com/accounts/google/login/"
+          style={{
+            display:'block',
+            background:'#4285f4',
+            color:'white',
+            padding:'12px',
+            borderRadius:'8px',
+            textDecoration:'none',
+            textAlign:'center',
+            marginTop:'12px',
+            fontWeight:'700'
+          }}
+        >
+          🔵 Login with Google
+      </a>
 
         <p style={{ textAlign: 'center', fontSize: '13px', color: 'rgba(245,245,245,0.3)' }}>
           New here?{' '}
