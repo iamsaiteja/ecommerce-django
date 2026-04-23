@@ -108,3 +108,7 @@ ecommerce/
 - Go to `/admin/` to manage products, users, coupons
 - Sellers need admin approval (`is_approved=True`) to sell
 - Set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `.env`
+ 
+ 
+ deploye test
+
