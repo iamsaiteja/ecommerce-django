@@ -11,6 +11,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+MEDIA_URL = "/media/"
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -104,6 +106,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # CSRF for Railway
 CSRF_TRUSTED_ORIGINS = [
+    "http://3.237.9.42",
+    "http://localhost",
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://*.railway.app',
