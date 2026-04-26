@@ -25,6 +25,7 @@ jobs:
             export GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             export GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             sudo apt install nginx -y
+            sudo apt install certbot python3-certbot-nginx -y
             sudo bash -c 'cat > /etc/nginx/sites-available/solemate << EOF
             server {
                 listen 80;
@@ -39,4 +40,5 @@ jobs:
             sudo ln -sf /etc/nginx/sites-available/solemate /etc/nginx/sites-enabled/
             sudo nginx -t
             sudo systemctl restart nginx
+            sudo certbot --nginx -d solemate.servecounterstrike.com --non-interactive --agree-tos -m tejayadav872@gmail.com
             sudo systemctl restart gunicorn
