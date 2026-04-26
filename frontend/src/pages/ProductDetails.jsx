@@ -42,7 +42,7 @@ function ProductDetails() {
         <div style={{ background: "#fff", borderRadius: "16px", padding: "40px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <img src={product.image} alt={product.name}
             style={{ width: "100%", maxHeight: "400px", objectFit: "contain" }}
-            onError={e => e.target.src = "https://via.placeholder.com/400"}
+            onError={e => e.target.style.display = "none"}
           />
         </div>
 
