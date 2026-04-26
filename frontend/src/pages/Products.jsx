@@ -119,7 +119,7 @@ function Products() {
                   transition: "transform 0.35s ease",
                   cursor: "zoom-in"
                 }}
-                onError={e => e.target.src = "https://via.placeholder.com/250"}
+                onError={e => e.target.style.display = "none"}
               />
             </div>
 
