@@ -14,10 +14,11 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
 
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-
+           host: ${{ secrets.EC2_HOST }}
+           username: ubuntu
+           key: ${{ secrets.EC2_SSH_KEY }}
+           port: 22  
+           
           script: |
             cd /home/ubuntu/ecommerce-django
             source venv/bin/activate
