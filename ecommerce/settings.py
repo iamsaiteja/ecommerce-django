@@ -136,3 +136,13 @@ SIMPLE_JWT = {
 # Razorpay
 RAZORPAY_KEY_ID = 'your_razorpay_key_id'
 RAZORPAY_KEY_SECRET = 'your_razorpay_key_secret'
+
+SSOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
+        }
+    }
+}
