@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const BASE_URL = "http://solemate.servecounterstrike.com";
+const BASE_URL = "https://solemate.servecounterstrike.com";
 
 
 const API = axios.create({

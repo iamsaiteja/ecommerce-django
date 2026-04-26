@@ -1,6 +1,8 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,7 +12,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-MEDIA_URL = "/media/"
 
 INSTALLED_APPS = [
     'django.contrib.admin',
