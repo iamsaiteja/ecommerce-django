@@ -25,6 +25,8 @@ jobs:
             pip install -r requirements.txt
             export GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             export GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            python manage.py migrate
+            sudo systemctl restart gunicorn
             sudo apt install nginx -y
             sudo apt install certbot python3-certbot-nginx -y
             sudo bash -c 'cat > /etc/nginx/sites-available/solemate << EOF
