@@ -134,7 +134,7 @@ SIMPLE_JWT = {
 RAZORPAY_KEY_ID = 'your_razorpay_key_id'
 RAZORPAY_KEY_SECRET = 'your_razorpay_key_secret'
 
-SITE_ID = 2
+SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
