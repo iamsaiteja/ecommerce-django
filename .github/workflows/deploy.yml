@@ -28,8 +28,15 @@ jobs:
             export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             python manage.py migrate
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> /home/ubuntu/ecommerce-django/.env
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /home/ubuntu/ecommerce-django/.env
+            cat > /home/ubuntu/ecommerce-django/.env << EOF
+            DB_NAME=ecommerce_db
+            DB_USER=postgres
+            DB_PASSWORD=Sai@1234Db
+            DB_HOST=localhost
+            DB_PORT=5432
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            EOF
             sudo systemctl restart gunicorn
             sudo apt install nginx -y
             sudo apt install certbot python3-certbot-nginx -y
