@@ -37,6 +37,21 @@ jobs:
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             EOF
+            sudo bash -c 'cat > /etc/systemd/system/gunicorn.service << GEOF
+            [Unit]
+            Description=gunicorn daemon
+            After=network.target
+
+            [Service]
+            User=ubuntu
+            WorkingDirectory=/home/ubuntu/ecommerce-django
+            EnvironmentFile=/home/ubuntu/ecommerce-django/.env
+            ExecStart=/home/ubuntu/ecommerce-django/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 ecommerce.wsgi:application
+
+            [Install]
+            WantedBy=multi-user.target
+            GEOF'
+            sudo systemctl daemon-reload
             sudo systemctl restart gunicorn
             sudo apt install nginx -y
             sudo apt install certbot python3-certbot-nginx -y
