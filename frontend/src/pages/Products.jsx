@@ -71,7 +71,9 @@ function Products() {
                 onMouseEnter={e => e.currentTarget.style.background = '#2a2a2a'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
-                <img src={p.image} alt={p.name}
+                <img 
+                  src={`http://100.56.17.207${p.image}`}
+                  alt={p.name}
                   style={{ width: '36px', height: '36px', objectFit: 'contain', borderRadius: '4px', background: '#fff' }}
                 />
                 <div>
@@ -111,7 +113,7 @@ function Products() {
             {/* Image */}
             <div style={{ overflow: "hidden", background: "#fff", height: "220px" }}>
               <img
-                src={p.image}
+                src={`http://100.56.17.207${p.image}`}
                 alt={p.name}
                 style={{
                   width: "100%", height: "220px", objectFit: "contain",
