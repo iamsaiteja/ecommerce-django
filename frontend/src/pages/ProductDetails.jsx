@@ -5,95 +5,141 @@ import API from "../utils/api";
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const SIZES = [6, 7, 8, 9, 10, 11, 12];
 
+  // 🔥 FETCH PRODUCT
   useEffect(() => {
+    setLoading(true);
+
     API.get(`/products/${id}/`)
-      .then(res => setProduct(res.data))
-      .catch(err => console.error(err));
+      .then((res) => {
+        setProduct(res.data);
+        setError("");
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to load product");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
   }, [id]);
 
+  // 🔥 ADD TO CART
   function addToCart() {
-    if (!selectedSize) { alert("Please select a size!"); return; }
-    API.post("/cart/add/", { product_id: product.id, size: selectedSize })
+    if (!selectedSize) {
+      alert("Please select a size!");
+      return;
+    }
+
+    API.post("/cart/add/", {
+      product_id: product.id,
+      size: selectedSize,
+    })
       .then(() => alert("Added to cart!"))
-      .catch(err => console.error(err));
+      .catch(() => alert("Something went wrong"));
   }
 
-  if (!product) return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "#555", letterSpacing: "2px" }}>LOADING...</p>
-    </div>
-  );
+  // 🔥 LOADING UI
+  if (loading) {
+    return (
+      <div style={{ background: "#0a0a0a", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "#999" }}>Loading product...</p>
+      </div>
+    );
+  }
+
+  // 🔥 ERROR UI
+  if (error) {
+    return (
+      <div style={{ background: "#0a0a0a", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "red" }}>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: "#0a0a0a", minHeight: "100vh", padding: "40px" }}>
 
-      <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "#666", fontSize: "14px", cursor: "pointer", marginBottom: "32px" }}>
+      <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "#666", cursor: "pointer" }}>
         ← Back
       </button>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", maxWidth: "1000px", margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", maxWidth: "1000px", margin: "40px auto" }}>
 
-        {/* Image */}
+        {/* IMAGE */}
         <div style={{ background: "#fff", borderRadius: "16px", padding: "40px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <img src={product.image} alt={product.name}
+          <img
+            src={product?.image}
+            alt={product?.name}
             style={{ width: "100%", maxHeight: "400px", objectFit: "contain" }}
-            onError={e => e.target.style.display = "none"}
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/300?text=No+Image";
+            }}
           />
         </div>
 
-        {/* Details */}
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        {/* DETAILS */}
+        <div>
 
-          <h1 style={{ color: "white", fontSize: "28px", fontWeight: "700", marginBottom: "12px" }}>
-            {product.name}
+          <h1 style={{ color: "white" }}>
+            {product?.name}
           </h1>
 
-          <p style={{ color: "#e8ff3b", fontSize: "28px", fontWeight: "700", marginBottom: "24px" }}>
-            ₹{parseFloat(product.price).toLocaleString("en-IN")}
+          <p style={{ color: "#e8ff3b", fontSize: "24px" }}>
+            ₹{parseFloat(product?.price || 0).toLocaleString("en-IN")}
           </p>
 
-          <p style={{ color: "#888", fontSize: "14px", marginBottom: "32px", lineHeight: "1.6" }}>
-            {product.description || "Premium footwear crafted for those who move with intention."}
+          <p style={{ color: "#888" }}>
+            {product?.description || "No description available"}
           </p>
 
-          {/* Sizes */}
-          <div style={{ marginBottom: "32px" }}>
-            <p style={{ color: "#666", fontSize: "12px", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "12px" }}>
-              Select Size {selectedSize && <span style={{ color: "#e8ff3b" }}>— UK {selectedSize}</span>}
+          {/* SIZE */}
+          <div style={{ marginTop: "20px" }}>
+            <p style={{ color: "#aaa" }}>
+              Select Size {selectedSize && `— ${selectedSize}`}
             </p>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {SIZES.map(size => (
-                <button key={size} onClick={() => setSelectedSize(size)}
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+              {SIZES.map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
                   style={{
-                    width: "48px", height: "48px", borderRadius: "8px",
-                    border: selectedSize === size ? "2px solid #e8ff3b" : "1px solid #333",
-                    background: selectedSize === size ? "#e8ff3b" : "transparent",
-                    color: selectedSize === size ? "#0a0a0a" : "white",
-                    fontSize: "14px", fontWeight: "600", cursor: "pointer"
+                    padding: "10px",
+                    border: selectedSize === size ? "2px solid yellow" : "1px solid gray",
+                    background: selectedSize === size ? "yellow" : "transparent",
+                    color: selectedSize === size ? "black" : "white",
+                    cursor: "pointer"
                   }}
-                >{size}</button>
+                >
+                  {size}
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Cart Button */}
-          <button onClick={addToCart}
+          {/* BUTTON */}
+          <button
+            onClick={addToCart}
             style={{
-              padding: "16px",
-              background: selectedSize ? "#e8ff3b" : "#1a1a1a",
-              color: selectedSize ? "#0a0a0a" : "#444",
-              border: "none", borderRadius: "10px",
-              fontSize: "14px", fontWeight: "700",
-              letterSpacing: "1px", textTransform: "uppercase",
+              marginTop: "30px",
+              padding: "15px",
+              width: "100%",
+              background: selectedSize ? "yellow" : "#333",
+              color: selectedSize ? "black" : "#777",
+              border: "none",
               cursor: selectedSize ? "pointer" : "not-allowed"
             }}
           >
-            {selectedSize ? `ADD TO CART — UK ${selectedSize}` : "SELECT A SIZE FIRST"}
+            {selectedSize ? "Add to Cart" : "Select Size First"}
           </button>
 
         </div>
