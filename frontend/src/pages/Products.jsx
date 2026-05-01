@@ -10,15 +10,17 @@ function Products() {
   const [hoveredBtn, setHoveredBtn] = useState(null);
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     API.get('/products/')
-        .then(res => setProducts(res.data))
+        .then(res => {
+          console.log("PRODUCTS:", res.data); // debug
+          setProducts(res.data);
+        })
         .catch(err => console.error("Error fetching products:", err))
-}, []);
+  }, []);
 
   function addToCart(e, productId) {
-    e.stopPropagation(); // card click trigger avvakunda
+    e.stopPropagation();
     API.post("/cart/add/", { product_id: productId })
       .then(() => alert("Added to cart"))
       .catch((err) => console.error("Cart error:", err));
@@ -28,11 +30,23 @@ function Products() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // 🔥 IMAGE FIX FUNCTION
+  function getImage(url) {
+    if (!url) return "https://via.placeholder.com/300?text=No+Image";
+
+    if (url.startsWith("http")) {
+      return url; // already full S3 URL
+    }
+
+    // fallback (just in case)
+    return "https://solemate-media.s3.us-east-1.amazonaws.com/" + url;
+  }
+
   return (
     <div style={{ padding: "40px", background: "#0a0a0a", minHeight: "100vh" }}>
       <h2 style={{ color: "white", marginBottom: "20px" }}>Products</h2>
 
-      {/* Search Bar */}
+      {/* Search */}
       <div style={{ position: 'relative', display: 'inline-block', marginBottom: '28px' }}>
         <input
           type="text"
@@ -46,9 +60,7 @@ function Products() {
             background: '#1a1a1a',
             border: '1px solid #333',
             borderRadius: '8px',
-            color: 'white',
-            fontSize: '14px',
-            outline: 'none'
+            color: 'white'
           }}
         />
 
@@ -57,28 +69,22 @@ function Products() {
             position: 'absolute', top: '100%', left: 0,
             width: '300px', background: '#1a1a1a',
             border: '1px solid #333', borderRadius: '8px',
-            zIndex: 999, marginTop: '4px', overflow: 'hidden'
+            zIndex: 999
           }}>
             {filtered.map(p => (
-              <div
-                key={p.id}
-                onMouseDown={() => { setSearch(p.name); setShowDropdown(false); }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  padding: '10px 14px', cursor: 'pointer',
-                  borderBottom: '1px solid #222', color: 'white', fontSize: '14px'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#2a2a2a'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              >
+              <div key={p.id}
+                   onMouseDown={() => { setSearch(p.name); setShowDropdown(false); }}
+                   style={{ display: 'flex', gap: '10px', padding: '10px', cursor: 'pointer' }}>
+                
                 <img 
-                  src={`http://100.56.17.207${p.image}`}
+                  src={getImage(p.image)}
                   alt={p.name}
-                  style={{ width: '36px', height: '36px', objectFit: 'contain', borderRadius: '4px', background: '#fff' }}
+                  style={{ width: '36px', height: '36px', objectFit: 'contain', background: '#fff' }}
                 />
+
                 <div>
-                  <div>{p.name}</div>
-                  <div style={{ color: '#e8ff3b', fontSize: '12px' }}>₹{p.price}</div>
+                  <div style={{ color: 'white' }}>{p.name}</div>
+                  <div style={{ color: '#e8ff3b' }}>₹{p.price}</div>
                 </div>
               </div>
             ))}
@@ -86,7 +92,7 @@ function Products() {
         )}
       </div>
 
-      {/* Products Grid */}
+      {/* GRID */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))",
@@ -100,62 +106,39 @@ function Products() {
             onMouseLeave={() => setHoveredCard(null)}
             style={{
               border: hoveredCard === p.id ? "1px solid #e8ff3b" : "1px solid #333",
-              padding: "0",
               borderRadius: "12px",
               overflow: "hidden",
               cursor: "pointer",
-              background: "#111",
-              transform: hoveredCard === p.id ? "translateY(-4px)" : "translateY(0)",
-              transition: "all 0.25s ease",
-              boxShadow: hoveredCard === p.id ? "0 8px 30px rgba(232,255,59,0.1)" : "none"
+              background: "#111"
             }}
           >
-            {/* Image */}
-            <div style={{ overflow: "hidden", background: "#fff", height: "220px" }}>
+            {/* IMAGE */}
+            <div style={{ background: "#fff", height: "220px" }}>
               <img
-                src={`http://100.56.17.207${p.image}`}
+                src={getImage(p.image)}
                 alt={p.name}
-                style={{
-                  width: "100%", height: "220px", objectFit: "contain",
-                  transform: hoveredCard === p.id ? "scale(1.06)" : "scale(1)",
-                  transition: "transform 0.35s ease",
-                  cursor: "zoom-in"
+                style={{ width: "100%", height: "220px", objectFit: "contain" }}
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/300?text=No+Image";
                 }}
-                onError={e => e.target.style.display = "none"}
               />
             </div>
 
-            {/* Info */}
+            {/* INFO */}
             <div style={{ padding: "16px" }}>
-              <h3 style={{
-                color: "white", fontSize: "14px", fontWeight: "600",
-                marginBottom: "6px", lineHeight: "1.4"
-              }}>
-                {p.name}
-              </h3>
-
-              <p style={{ color: "#e8ff3b", fontWeight: "700", fontSize: "16px", marginBottom: "14px" }}>
+              <h3 style={{ color: "white" }}>{p.name}</h3>
+              <p style={{ color: "#e8ff3b" }}>
                 ₹{parseFloat(p.price).toLocaleString('en-IN')}
               </p>
 
-              {/* Add To Cart Button */}
               <button
                 onClick={e => addToCart(e, p.id)}
-                onMouseEnter={() => setHoveredBtn(p.id)}
-                onMouseLeave={() => setHoveredBtn(null)}
                 style={{
                   width: "100%",
                   padding: "10px",
-                  background: hoveredBtn === p.id ? "#e8ff3b" : "transparent",
-                  color: hoveredBtn === p.id ? "#0a0a0a" : "#e8ff3b",
-                  border: "1.5px solid #e8ff3b",
-                  borderRadius: "8px",
-                  fontWeight: "700",
-                  fontSize: "13px",
-                  letterSpacing: "0.5px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  textTransform: "uppercase"
+                  border: "1px solid #e8ff3b",
+                  color: "#e8ff3b",
+                  background: "transparent"
                 }}
               >
                 Add To Cart
