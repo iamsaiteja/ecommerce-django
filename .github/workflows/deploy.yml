@@ -39,4 +39,4 @@ jobs:
             sudo nginx -t
             sudo systemctl restart nginx
             sudo certbot --nginx -d solemate.servecounterstrike.com --non-interactive --agree-tos -m tejayadav872@gmail.com
-            sudo systemctl restart gunicorn
+            sudo systemctl restart gunicorngit
