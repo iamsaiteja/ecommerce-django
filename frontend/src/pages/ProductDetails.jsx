@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import API from "../utils/api";
-import { getImage } from "../utils/api";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -20,7 +19,7 @@ function ProductDetails() {
 
     API.get(`/products/${id}/`)
       .then((res) => {
-        console.log("PRODUCT DATA:", res.data); // ✅ check data vasthunda leda
+        console.log("PRODUCT DATA:", res.data); // 🔍 check here
         setProduct(res.data);
         setError("");
       })
@@ -70,38 +69,32 @@ function ProductDetails() {
   return (
     <div style={{ background: "#0a0a0a", minHeight: "100vh", padding: "40px" }}>
 
-      <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", color: "#666", cursor: "pointer" }}>
+      <button
+        onClick={() => navigate(-1)}
+        style={{ background: "none", border: "none", color: "#666", cursor: "pointer" }}
+      >
         ← Back
       </button>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", maxWidth: "1000px", margin: "40px auto" }}>
 
-        {/* IMAGE */}
+        {/* 🖼 IMAGE */}
         <div style={{ background: "#fff", borderRadius: "16px", padding: "40px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-
-          {/* ⚠️ IMPORTANT FIX */}
           {product && product.image && (
             <img
-              src={getImage(product.image)}  
-              // 👉 ikkada only getImage vadali, manual URL vadakudadhu
-
+              src={product.image}   // ✅ FINAL FIX
               alt={product.name}
               style={{ width: "100%", maxHeight: "400px", objectFit: "contain" }}
-
               onError={(e) => {
                 e.target.src = "https://via.placeholder.com/300?text=No+Image";
               }}
             />
           )}
-
         </div>
 
-        {/* DETAILS */}
+        {/* 📦 DETAILS */}
         <div>
-
-          <h1 style={{ color: "white" }}>
-            {product?.name}
-          </h1>
+          <h1 style={{ color: "white" }}>{product?.name}</h1>
 
           <p style={{ color: "#e8ff3b", fontSize: "24px" }}>
             ₹{parseFloat(product?.price || 0).toLocaleString("en-IN")}
@@ -151,8 +144,8 @@ function ProductDetails() {
           >
             {selectedSize ? "Add to Cart" : "Select Size First"}
           </button>
-
         </div>
+
       </div>
     </div>
   );

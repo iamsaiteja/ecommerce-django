@@ -1,4 +1,4 @@
-import API, { getImage } from "../utils/api";
+import API from "../utils/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +14,7 @@ function Products() {
   useEffect(() => {
     API.get("/products/")
       .then((res) => {
-        console.log("PRODUCTS:", res.data);
+        console.log("PRODUCTS:", res.data); // 👈 check image url ikkada
         setProducts(res.data);
       })
       .catch((err) => console.error("Error:", err));
@@ -86,11 +86,9 @@ function Products() {
                   cursor: "pointer",
                 }}
               >
-                {/* ❗IMPORTANT:
-                    mundu nuvvu product.image vaduthunnav
-                    kani map lo variable p kabatti p.image vadali */}
+                {/* ✅ SIMPLE: direct ga use */}
                 <img
-                  src={getImage(p.image)}
+                  src={p.image}
                   alt={p.name}
                   style={{
                     width: "36px",
@@ -138,7 +136,7 @@ function Products() {
             {/* 🖼 IMAGE */}
             <div style={{ background: "#fff", height: "220px" }}>
               <img
-                src={getImage(p.image)}
+                src={p.image}  // ✅ FINAL FIX
                 alt={p.name}
                 style={{
                   width: "100%",
@@ -146,8 +144,6 @@ function Products() {
                   objectFit: "contain",
                 }}
                 onError={(e) => {
-                  /* ❗idi fallback image
-                     S3 lo issue unte matrame vastundi */
                   e.target.src =
                     "https://via.placeholder.com/300?text=No+Image";
                 }}
