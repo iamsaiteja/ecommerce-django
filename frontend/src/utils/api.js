@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 // ✅ Base URL
 const BASE_URL = "https://solemate.servecounterstrike.com";
 
@@ -55,6 +56,18 @@ API.interceptors.response.use(
 
 export const getProduct = (id) => {
   return API.get(`/products/${id}/`);
+};
+
+export const getImage = (url) => {
+  if (!url) return "";
+
+  // already full S3 URL unte
+  if (url.startsWith("http")) {
+    return url;
+  }
+
+  // local media case
+  return `https://solemate.servecounterstrike.com${url}`;
 };
 
 export default API;
