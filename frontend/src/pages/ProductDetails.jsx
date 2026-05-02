@@ -20,7 +20,7 @@ function ProductDetails() {
 
     API.get(`/products/${id}/`)
       .then((res) => {
-        console.log("PRODUCT DATA:", res.data); // 🔍 debug
+        console.log("PRODUCT DATA:", res.data); // ✅ check data vasthunda leda
         setProduct(res.data);
         setError("");
       })
@@ -67,13 +67,6 @@ function ProductDetails() {
     );
   }
 
-  // 🔥 IMAGE FIX (IMPORTANT PART)
-  let imageUrl = product?.image;
-
-  if (imageUrl && !imageUrl.startsWith("http")) {
-    imageUrl = "https://solemate-media.s3.us-east-1.amazonaws.com/" + imageUrl;
-  }
-
   return (
     <div style={{ background: "#0a0a0a", minHeight: "100vh", padding: "40px" }}>
 
@@ -85,14 +78,22 @@ function ProductDetails() {
 
         {/* IMAGE */}
         <div style={{ background: "#fff", borderRadius: "16px", padding: "40px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <img
-            src={getImage(product.image)}
-            alt={product?.name}
-            style={{ width: "100%", maxHeight: "400px", objectFit: "contain" }}
-            onError={(e) => {
-              e.target.src = "https://via.placeholder.com/300?text=No+Image";
-            }}
-          />
+
+          {/* ⚠️ IMPORTANT FIX */}
+          {product && product.image && (
+            <img
+              src={getImage(product.image)}  
+              // 👉 ikkada only getImage vadali, manual URL vadakudadhu
+
+              alt={product.name}
+              style={{ width: "100%", maxHeight: "400px", objectFit: "contain" }}
+
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/300?text=No+Image";
+              }}
+            />
+          )}
+
         </div>
 
         {/* DETAILS */}
