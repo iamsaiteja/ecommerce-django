@@ -2,6 +2,8 @@ import API from "../utils/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const BASE_URL = "https://solemate.servecounterstrike.com";
+
 function Products() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
@@ -10,17 +12,15 @@ function Products() {
 
   const navigate = useNavigate();
 
-  // 🔥 FETCH PRODUCTS
   useEffect(() => {
     API.get("/products/")
       .then((res) => {
-        console.log("PRODUCTS:", res.data); // 👈 check image url ikkada
+        console.log("PRODUCTS:", res.data);
         setProducts(res.data);
       })
       .catch((err) => console.error("Error:", err));
   }, []);
 
-  // 🔥 ADD TO CART
   function addToCart(e, productId) {
     e.stopPropagation();
     API.post("/cart/add/", { product_id: productId })
@@ -28,7 +28,6 @@ function Products() {
       .catch((err) => console.error("Cart error:", err));
   }
 
-  // 🔥 SEARCH FILTER
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -86,10 +85,14 @@ function Products() {
                   cursor: "pointer",
                 }}
               >
-                {/* ✅ SIMPLE: direct ga use */}
+                {/* ✅ FIX 1: BASE_URL add చేశాం */}
                 <img
-                  src={p.image}
+                  src={`${BASE_URL}${p.image}`}
                   alt={p.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://placehold.co/300x300?text=No+Image";
+                  }}
                   style={{
                     width: "36px",
                     height: "36px",
@@ -97,7 +100,6 @@ function Products() {
                     background: "#fff",
                   }}
                 />
-
                 <div>
                   <div style={{ color: "white" }}>{p.name}</div>
                   <div style={{ color: "#e8ff3b" }}>₹{p.price}</div>
@@ -123,20 +125,17 @@ function Products() {
             onMouseEnter={() => setHoveredCard(p.id)}
             onMouseLeave={() => setHoveredCard(null)}
             style={{
-              border:
-                hoveredCard === p.id
-                  ? "1px solid #e8ff3b"
-                  : "1px solid #333",
+              border: hoveredCard === p.id ? "1px solid #e8ff3b" : "1px solid #333",
               borderRadius: "12px",
               overflow: "hidden",
               cursor: "pointer",
               background: "#111",
             }}
           >
-            {/* 🖼 IMAGE */}
+            {/* ✅ FIX 2: BASE_URL add చేశాం */}
             <div style={{ background: "#fff", height: "220px" }}>
               <img
-                src={p.image}  // ✅ FINAL FIX
+                src={`${BASE_URL}${p.image}`}
                 alt={p.name}
                 style={{
                   width: "100%",
@@ -144,8 +143,8 @@ function Products() {
                   objectFit: "contain",
                 }}
                 onError={(e) => {
-                  e.target.src =
-                    "https://via.placeholder.com/300?text=No+Image";
+                  e.target.onerror = null;
+                  e.target.src = "https://placehold.co/300x300?text=No+Image";
                 }}
               />
             </div>
@@ -153,11 +152,9 @@ function Products() {
             {/* 📦 DETAILS */}
             <div style={{ padding: "16px" }}>
               <h3 style={{ color: "white" }}>{p.name}</h3>
-
               <p style={{ color: "#e8ff3b" }}>
                 ₹{parseFloat(p.price).toLocaleString("en-IN")}
               </p>
-
               <button
                 onClick={(e) => addToCart(e, p.id)}
                 style={{
