@@ -135,7 +135,7 @@ function Products() {
             {/* ✅ FIX 2: BASE_URL add చేశాం */}
             <div style={{ background: "#fff", height: "220px" }}>
               <img
-                src={`${BASE_URL}${p.image}`}
+                src={p.image}
                 alt={p.name}
                 style={{
                   width: "100%",
