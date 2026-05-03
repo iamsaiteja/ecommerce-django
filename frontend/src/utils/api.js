@@ -65,7 +65,9 @@ export const getImage = (url) => {
   if (url.startsWith("http")) {
     return url;
   }
+  // /media/products/... 
+  if (url.startsWith("/media/")) {
+    return `${BASE_URL}${url}`;
+  }
   return `${BASE_URL}/media/${url}`;
 };
-
-export default API;
