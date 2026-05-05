@@ -76,12 +76,8 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ecommerce',
-        'USER': 'saiteja',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -104,14 +100,20 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ================= CORS + CSRF =================
+
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://solemate01.vercel.app",
+    "https://solemate-33tpuetc1-iamsaitejas-projects.vercel.app"
+]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://3.237.9.42",
-    "https://solemate.servecounterstrike.com",
+    "http://localhost:3000",
     "https://solemate01.vercel.app",
-    'http://localhost:3000',
+    "https://solemate-33tpuetc1-iamsaitejas-projects.vercel.app"
 ]
 
 MEDIA_URL = '/media/'
