@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://ecommerce-django-umber.vercel.app";
-
+const BASE_URL = "https://solemate.servecounterstrike.com";
 export const getImage = (path) => {
   if (!path) return "";
   return `${BASE_URL}${path}`;
