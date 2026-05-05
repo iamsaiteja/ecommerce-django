@@ -2,12 +2,13 @@ import axios from "axios";
 
 const BASE_URL = "https://solemate.servecounterstrike.com";
 
+// ✅ Axios instance
 const API = axios.create({
   baseURL: `${BASE_URL}/api`,
   withCredentials: true,
 });
 
-// 🔐 Request interceptor
+// 🔐 Request interceptor (attach token)
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
   if (token) {
@@ -16,7 +17,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// 🔄 Response interceptor
+// 🔄 Response interceptor (refresh token)
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -43,6 +44,7 @@ API.interceptors.response.use(
 
         localStorage.setItem("access", res.data.access);
         originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+
         return API(originalRequest);
 
       } catch (err) {
@@ -55,20 +57,29 @@ API.interceptors.response.use(
   }
 );
 
-// 🖼️ ONLY ONE getImage
+
+
+// 🖼️ FINAL IMAGE FUNCTION (NO CONFUSION VERSION)
 export const getImage = (url) => {
-  if (!url) return "https://via.placeholder.com/300?text=No+Image";
-
-  if (url.startsWith("http")) return url;
-
-  if (url.startsWith("/media/")) {
-    return `${BASE_URL}${url}`;
+  if (!url) {
+    return "https://via.placeholder.com/300?text=No+Image";
   }
 
-  return `${BASE_URL}/media/${url}`;
+  // already full URL
+  if (url.startsWith("http")) {
+    return url;
+  }
+
+  // normalize path
+  const cleanUrl = url.startsWith("/media/")
+    ? url
+    : `/media/${url}`;
+
+  return `${BASE_URL}${cleanUrl}`;
 };
 
-// 📦 Product API
+
+// 📦 Example API
 export const getProduct = (id) => {
   return API.get(`/products/${id}/`);
 };
