@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../utils/api';
 
-
 function Login() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 🔥 HANDLE GOOGLE REDIRECT TOKEN
+  // 🔥 GOOGLE LOGIN REDIRECT HANDLE
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const access = params.get("access");
@@ -18,9 +17,13 @@ function Login() {
     if (access && refresh) {
       localStorage.setItem("access", access);
       localStorage.setItem("refresh", refresh);
+
+      // clean URL (remove ?access=...)
+      window.history.replaceState({}, document.title, "/");
+
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,9 +46,21 @@ function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#0a0a0a' }}>
-      <div style={{ background: '#111', padding: '40px', borderRadius: '12px', width: '350px' }}>
-        <h2 style={{ color: 'white' }}>Login</h2>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: '#0a0a0a'
+    }}>
+      <div style={{
+        background: '#111',
+        padding: '40px',
+        borderRadius: '12px',
+        width: '350px',
+        boxShadow: '0 0 20px rgba(255,255,255,0.05)'
+      }}>
+        <h2 style={{ color: 'white', marginBottom: '20px' }}>Login</h2>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
@@ -54,24 +69,55 @@ function Login() {
             placeholder="Username"
             value={form.username}
             onChange={e => setForm({ ...form, username: e.target.value })}
+            required
+            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
           />
+
           <input
             type="password"
             placeholder="Password"
             value={form.password}
             onChange={e => setForm({ ...form, password: e.target.value })}
+            required
+            style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
           />
-          <button disabled={loading}>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '10px',
+              background: '#e8ff3b',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
 
-        {/* GOOGLE LOGIN */}
-        <a href="https://solemate.servecounterstrike.com/accounts/google/login/">
+        {/* 🔥 GOOGLE LOGIN */}
+        <a
+          href="https://solemate.servecounterstrike.com/accounts/google/login/"
+          style={{
+            display: 'block',
+            marginTop: '15px',
+            padding: '10px',
+            background: '#4285f4',
+            color: 'white',
+            textAlign: 'center',
+            borderRadius: '6px',
+            textDecoration: 'none'
+          }}
+        >
           Login with Google
         </a>
 
-        <p><Link to="/register">Register</Link></p>
+        <p style={{ marginTop: '15px', color: '#aaa' }}>
+          New user? <Link to="/register" style={{ color: '#e8ff3b' }}>Register</Link>
+        </p>
       </div>
     </div>
   );
