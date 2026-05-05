@@ -1,10 +1,6 @@
 import axios from "axios";
 
 const BASE_URL = "https://solemate.servecounterstrike.com";
-export const getImage = (path) => {
-  if (!path) return "";
-  return `${BASE_URL}${path}`;
-};
 
 const API = axios.create({
   baseURL: `${BASE_URL}/api`,
@@ -26,9 +22,7 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (!originalRequest) {
-      return Promise.reject(error);
-    }
+    if (!originalRequest) return Promise.reject(error);
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -61,26 +55,22 @@ API.interceptors.response.use(
   }
 );
 
+// 🖼️ ONLY ONE getImage
+export const getImage = (url) => {
+  if (!url) return "https://via.placeholder.com/300?text=No+Image";
+
+  if (url.startsWith("http")) return url;
+
+  if (url.startsWith("/media/")) {
+    return `${BASE_URL}${url}`;
+  }
+
+  return `${BASE_URL}/media/${url}`;
+};
+
 // 📦 Product API
 export const getProduct = (id) => {
   return API.get(`/products/${id}/`);
 };
 
-// 🖼️ Image handler (VERY IMPORTANT FIX)
-export const getImage = (url) => {
-  if (!url) return "https://via.placeholder.com/300?text=No+Image";
-
-  // already full URL
-  if (url.startsWith("http")) return url;
-
-  // correct case
-  if (url.startsWith("/media/")) {
-    return `${BASE_URL}${url}`;
-  }
-
-  // FINAL FIX (most important)
-  return `${BASE_URL}/media/${url}`;
-};
-
-// ⭐ FINAL LINE (DON'T TOUCH)
 export default API;
