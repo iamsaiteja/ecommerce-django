@@ -1,11 +1,18 @@
 import axios from "axios";
 
-const BASE_URL = "https://solemate.servecounterstrike.com";
+const BASE_URL = "https://ecommerce-django-umber.vercel.app";
+
+export const getImage = (path) => {
+  if (!path) return "";
+  return `${BASE_URL}${path}`;
+};
 
 const API = axios.create({
   baseURL: `${BASE_URL}/api`,
+  withCredentials: true,
 });
 
+// 🔐 Request interceptor
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
   if (token) {
@@ -14,6 +21,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+// 🔄 Response interceptor
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -54,20 +62,26 @@ API.interceptors.response.use(
   }
 );
 
+// 📦 Product API
 export const getProduct = (id) => {
   return API.get(`/products/${id}/`);
 };
 
+// 🖼️ Image handler (VERY IMPORTANT FIX)
 export const getImage = (url) => {
-  if (!url) {
-    return "https://via.placeholder.com/300?text=No+Image";
-  }
-  if (url.startsWith("http")) {
-    return url;
-  }
-  // /media/products/... 
+  if (!url) return "https://via.placeholder.com/300?text=No+Image";
+
+  // already full URL
+  if (url.startsWith("http")) return url;
+
+  // correct case
   if (url.startsWith("/media/")) {
     return `${BASE_URL}${url}`;
   }
+
+  // FINAL FIX (most important)
   return `${BASE_URL}/media/${url}`;
 };
+
+// ⭐ FINAL LINE (DON'T TOUCH)
+export default API;

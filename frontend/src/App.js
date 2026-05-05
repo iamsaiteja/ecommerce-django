@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
@@ -30,5 +30,7 @@ function App() {
     </Router>
   );
 }
+
+
 
 export default App;

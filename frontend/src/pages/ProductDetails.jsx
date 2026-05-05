@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import API from "../utils/api";
+
+import API, { getImage } from "../utils/api";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -82,7 +83,7 @@ function ProductDetails() {
         <div style={{ background: "#fff", borderRadius: "16px", padding: "40px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {product && product.image && (
             <img
-              src={product.image}   // ✅ FINAL FIX
+              src={getImage(product.image)}  // ✅ FINAL FIX
               alt={product.name}
               style={{ width: "100%", maxHeight: "400px", objectFit: "contain" }}
               onError={(e) => {
