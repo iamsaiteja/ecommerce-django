@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import API, { getImage } from "../utils/api";
 
 function Cart() {
@@ -119,8 +118,8 @@ function Cart() {
             onChange={e => setForm({ ...form, phone: e.target.value })}
           />
 
-          <button onClick={handleCheckout}>
-            Pay Now
+          <button onClick={handleCheckout} disabled={placing}>
+            {placing ? "Processing..." : "Pay Now"}
           </button>
         </div>
       )}
