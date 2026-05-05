@@ -23,6 +23,7 @@ function Navbar() {
     setUser(null);
     navigate('/login');
   };
+  <button onClick={logout}>Logout</button>
 
   const linkStyle = (path) => ({
     fontSize: '13px',

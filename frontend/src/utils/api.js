@@ -2,6 +2,8 @@ import axios from "axios";
 
 const BASE_URL = "https://solemate.servecounterstrike.com";
 
+axios.defaults.withCredentials = true;
+
 // ✅ Axios instance
 const API = axios.create({
   baseURL: `${BASE_URL}/api`,
