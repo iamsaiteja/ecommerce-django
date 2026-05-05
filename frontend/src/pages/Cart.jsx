@@ -12,22 +12,34 @@ function Cart() {
     try {
       const res = await API.get('/cart/');
       setCart(res.data);
+    } catch (err) {
+      console.error("Cart error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchCart(); }, []);
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   const removeItem = async (id) => {
-    await API.delete(`/cart/remove/${id}/`);
-    fetchCart();
+    try {
+      await API.delete(`/cart/remove/${id}/`);
+      fetchCart();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const updateQty = async (id, qty) => {
-    if (qty < 1) return removeItem(id);
-    await API.patch(`/cart/update/${id}/`, { quantity: qty });
-    fetchCart();
+    try {
+      if (qty < 1) return removeItem(id);
+      await API.patch(`/cart/update/${id}/`, { quantity: qty });
+      fetchCart();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleCheckout = async () => {
@@ -55,11 +67,19 @@ function Cart() {
           fetchCart();
           setStep('cart');
         },
-        prefill: { name, email, contact: form.phone },
+        prefill: {
+          name: name || "",
+          email: email || "",
+          contact: form.phone || ""
+        },
         theme: { color: '#e8ff3b' },
       };
 
-      new window.Razorpay(options).open();
+      if (window.Razorpay) {
+        new window.Razorpay(options).open();
+      } else {
+        alert("Payment SDK not loaded");
+      }
 
     } catch (err) {
       alert(err.response?.data?.error || 'Checkout failed');
@@ -82,13 +102,13 @@ function Cart() {
         cart.items.map(item => (
           <div key={item.id}>
             <img
-              src={getImage(item.product.image)}
-              alt={item.product.name}
+              src={getImage(item?.product?.image)}
+              alt={item?.product?.name}
               width="100"
             />
 
-            <p>{item.product.name}</p>
-            <p>₹{item.product.price}</p>
+            <p>{item?.product?.name}</p>
+            <p>₹{item?.product?.price}</p>
 
             <button onClick={() => updateQty(item.id, item.quantity - 1)}>-</button>
             <span>{item.quantity}</span>
@@ -110,12 +130,16 @@ function Cart() {
           <input
             placeholder="Address"
             value={form.shipping_address}
-            onChange={e => setForm({ ...form, shipping_address: e.target.value })}
+            onChange={e =>
+              setForm({ ...form, shipping_address: e.target.value })
+            }
           />
           <input
             placeholder="Phone"
             value={form.phone}
-            onChange={e => setForm({ ...form, phone: e.target.value })}
+            onChange={e =>
+              setForm({ ...form, phone: e.target.value })
+            }
           />
 
           <button onClick={handleCheckout} disabled={placing}>
