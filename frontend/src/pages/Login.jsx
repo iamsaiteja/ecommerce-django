@@ -17,6 +17,7 @@ function Login() {
     if (access && refresh) {
       localStorage.setItem("access", access);
       localStorage.setItem("refresh", refresh);
+      localStorage.setItem("username", "GoogleUser");
 
       // clean URL (remove ?access=...)
       window.history.replaceState({}, document.title, "/");
