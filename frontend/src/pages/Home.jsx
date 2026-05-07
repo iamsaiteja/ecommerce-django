@@ -26,6 +26,7 @@ function Home() {
         product_id: productId,
         quantity: 1,
       });
+
       alert("Added to cart");
     } catch {
       alert("Error adding to cart");
@@ -33,9 +34,72 @@ function Home() {
   };
 
   return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh", padding: "20px" }}>
-      <h2 style={{ color: "white" }}>Featured Products</h2>
+    <div
+      style={{
+        background: "#0a0a0a",
+        minHeight: "100vh",
+        padding: "20px",
+        paddingTop: "90px",
+      }}
+    >
+      {/* HERO SECTION */}
+      <div
+        style={{
+          height: "60vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "white",
+          textAlign: "center",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "60px",
+            marginBottom: "20px",
+            letterSpacing: "3px",
+          }}
+        >
+          SOLEMATE
+        </h1>
 
+        <p
+          style={{
+            fontSize: "20px",
+            color: "#ccc",
+          }}
+        >
+          Premium Shoes Collection
+        </p>
+
+        <button
+          onClick={() => navigate("/products")}
+          style={{
+            marginTop: "20px",
+            padding: "12px 30px",
+            background: "#e8ff3b",
+            border: "none",
+            fontWeight: "bold",
+            cursor: "pointer",
+            borderRadius: "5px",
+          }}
+        >
+          Shop Now
+        </button>
+      </div>
+
+      {/* FEATURED PRODUCTS */}
+      <h2
+        style={{
+          color: "white",
+          marginBottom: "20px",
+        }}
+      >
+        Featured Products
+      </h2>
+
+      {/* PRODUCTS GRID */}
       <div
         style={{
           display: "grid",
@@ -53,9 +117,9 @@ function Home() {
               padding: "10px",
               background: "#161616",
               cursor: "pointer",
+              transition: "0.3s",
             }}
           >
-            {/* ✅ IMAGE FIX */}
             <img
               src={getImage(p.image)}
               alt={p.name}
@@ -63,17 +127,32 @@ function Home() {
                 width: "100%",
                 height: "180px",
                 objectFit: "contain",
+                background: "white",
+                borderRadius: "5px",
               }}
             />
 
-            <h4 style={{ color: "white" }}>{p.name}</h4>
+            <h4
+              style={{
+                color: "white",
+                marginTop: "10px",
+              }}
+            >
+              {p.name}
+            </h4>
 
-            <p style={{ color: "#e8ff3b" }}>₹{p.price}</p>
+            <p
+              style={{
+                color: "#e8ff3b",
+                fontWeight: "bold",
+              }}
+            >
+              ₹{p.price}
+            </p>
 
-            {/* ✅ CART FIX */}
             <button
               onClick={(e) => {
-                e.stopPropagation(); // VERY IMPORTANT
+                e.stopPropagation();
                 addToCart(p.id);
               }}
               style={{
@@ -82,6 +161,7 @@ function Home() {
                 padding: "8px 12px",
                 cursor: "pointer",
                 fontWeight: "bold",
+                borderRadius: "5px",
               }}
             >
               + Cart
