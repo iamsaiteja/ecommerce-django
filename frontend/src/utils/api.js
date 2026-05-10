@@ -10,48 +10,80 @@ const API = axios.create({
   withCredentials: true,
 });
 
-// 🔐 Request interceptor (attach token)
+// 🔐 REQUEST INTERCEPTOR
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("access");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
-// 🔄 Response interceptor (refresh token)
+// 🔄 RESPONSE INTERCEPTOR
 API.interceptors.response.use(
   (response) => response,
+
   async (error) => {
     const originalRequest = error.config;
 
-    if (!originalRequest) return Promise.reject(error);
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 🔥 TOKEN EXPIRED
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       try {
         const refresh = localStorage.getItem("refresh");
 
+        // ❌ NO REFRESH TOKEN
         if (!refresh) {
           localStorage.clear();
-          window.location.href = "/login";
+          window.location.replace("/login");
           return;
         }
 
+        // 🔥 GET NEW ACCESS TOKEN
         const res = await axios.post(
           `${BASE_URL}/api/auth/refresh/`,
-          { refresh }
+          {
+            refresh,
+          }
         );
 
-        localStorage.setItem("access", res.data.access);
-        originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+        // ✅ SAVE NEW ACCESS TOKEN
+        localStorage.setItem(
+          "access",
+          res.data.access
+        );
 
+        // ✅ SAVE NEW REFRESH TOKEN
+        if (res.data.refresh) {
+          localStorage.setItem(
+            "refresh",
+            res.data.refresh
+          );
+        }
+
+        // 🔥 UPDATE HEADER
+        originalRequest.headers.Authorization =
+          `Bearer ${res.data.access}`;
+
+        // 🔥 RETRY ORIGINAL REQUEST
         return API(originalRequest);
 
       } catch (err) {
+
+        // ❌ REFRESH FAILED
         localStorage.clear();
-        window.location.href = "/login";
+
+        window.location.replace("/login");
       }
     }
 
@@ -59,10 +91,9 @@ API.interceptors.response.use(
   }
 );
 
-
-
-// 🖼️ FINAL IMAGE FUNCTION (NO CONFUSION VERSION)
+// 🖼️ IMAGE FUNCTION
 export const getImage = (url) => {
+
   if (!url) {
     return "https://via.placeholder.com/300?text=No+Image";
   }
@@ -72,7 +103,7 @@ export const getImage = (url) => {
     return url;
   }
 
-  // normalize path
+  // normalize media path
   const cleanUrl = url.startsWith("/media/")
     ? url
     : `/media/${url}`;
@@ -80,8 +111,7 @@ export const getImage = (url) => {
   return `${BASE_URL}${cleanUrl}`;
 };
 
-
-// 📦 Example API
+// 📦 PRODUCT API
 export const getProduct = (id) => {
   return API.get(`/products/${id}/`);
 };
