@@ -15,6 +15,17 @@ function Home() {
       .catch((err) => console.error(err));
   }, []);
 
+  // 🔥 Protected Navigation
+  const handleProtectedRoute = () => {
+    const token = localStorage.getItem("access");
+
+    if (token) {
+      navigate("/products");
+    } else {
+      navigate("/login");
+    }
+  };
+
   const addToCart = async (productId) => {
     if (!localStorage.getItem("access")) {
       navigate("/login");
@@ -89,8 +100,9 @@ function Home() {
             justifyContent: "center",
           }}
         >
+          {/* SHOP NOW */}
           <button
-            onClick={() => navigate("/products")}
+            onClick={handleProtectedRoute}
             style={{
               padding: "15px 40px",
               background: "#e8ff3b",
@@ -104,7 +116,9 @@ function Home() {
             Shop Now
           </button>
 
+          {/* EXPLORE COLLECTION */}
           <button
+            onClick={handleProtectedRoute}
             style={{
               padding: "15px 40px",
               background: "transparent",
