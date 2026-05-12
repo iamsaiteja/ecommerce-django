@@ -7,4 +7,5 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('profile/', views.get_profile, name='profile'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('google/callback/', views.google_login_callback, name='google-callback'),
 ]

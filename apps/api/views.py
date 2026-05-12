@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import redirect
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -68,3 +69,11 @@ def get_profile(request):
         'first_name': user.first_name,
         'last_name': user.last_name,
     })
+    
+def google_login_callback(request):
+    user = request.user
+    if user.is_authenticated:
+        tokens = get_tokens_for_user(user)
+        frontend_url = "https://solemate01.vercel.app/login"
+        return redirect(f"{frontend_url}?access={tokens['access']}&refresh={tokens['refresh']}")
+    return redirect("https://solemate01.vercel.app/login")
