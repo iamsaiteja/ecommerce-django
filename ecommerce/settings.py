@@ -165,7 +165,7 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-LOGIN_REDIRECT_URL = "/api/auth/google/callback/"
+LOGIN_REDIRECT_URL = "/accounts/google/jwt-callback/"
 LOGOUT_REDIRECT_URL = "https://solemate01.vercel.app"
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
