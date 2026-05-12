@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
+from .views import google_callback   
 
 
 def home(request):
@@ -21,6 +22,7 @@ urlpatterns = [
 
     # GOOGLE AUTH
     path('accounts/', include('allauth.urls')),
+    path('accounts/google/jwt-callback/', google_callback, name='google_callback'), 
 ]
 
 urlpatterns += static(
