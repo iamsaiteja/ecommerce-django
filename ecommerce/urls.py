@@ -22,9 +22,9 @@ urlpatterns = [
 
     # GOOGLE AUTH
     path('accounts/', include('allauth.urls')),
-    path('accounts/google/jwt-callback/', google_callback, name='google_callback'),
-]
+    
 
+]
 urlpatterns += static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT

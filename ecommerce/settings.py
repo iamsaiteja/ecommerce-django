@@ -10,7 +10,12 @@ SECRET_KEY = 'your-secret-key-change-this-in-production'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "100.56.17.207",
+    "ecommerce-django-umber.vercel.app",
+]
 
 
 INSTALLED_APPS = [
@@ -111,12 +116,13 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://solemate01.vercel.app",
-    "https://solemate-33tpuetc1-iamsaitejas-projects.vercel.app"
+    "https://ecommerce-django-umber.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "https://solemate01.vercel.app",
+    "https://ecommerce-django-umber.vercel.app",
     "https://solemate-33tpuetc1-iamsaitejas-projects.vercel.app"
 ]
 
@@ -165,7 +171,7 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-SOCIALACCOUNT_LOGIN_REDIRECT_URL = "/accounts/google/jwt-callback/"
+LOGIN_REDIRECT_URL = "/users/auth/google/callback/"
 LOGOUT_REDIRECT_URL = "https://solemate01.vercel.app"
 
 
