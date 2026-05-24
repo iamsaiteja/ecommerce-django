@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import API from '../utils/api';
 
 const STATUS = {
-  pending:    { color: '#e8a83b', bg: 'rgba(232,168,59,0.1)',  label: 'Pending' },
-  processing: { color: '#3b9de8', bg: 'rgba(59,157,232,0.1)',  label: 'Processing' },
-  shipped:    { color: '#a83be8', bg: 'rgba(168,59,232,0.1)',  label: 'Shipped' },
-  delivered:  { color: '#3be87b', bg: 'rgba(59,232,123,0.1)',  label: 'Delivered' },
-  cancelled:  { color: '#e84545', bg: 'rgba(232,69,69,0.1)',   label: 'Cancelled' },
+  pending:    { color: '#b45309', bg: '#fef3c7', label: 'Pending' },
+  processing: { color: '#1d4ed8', bg: '#dbeafe', label: 'Processing' },
+  shipped:    { color: '#7c3aed', bg: '#ede9fe', label: 'Shipped' },
+  delivered:  { color: '#15803d', bg: '#dcfce7', label: 'Delivered' },
+  cancelled:  { color: '#dc2626', bg: '#fee2e2', label: 'Cancelled' },
 };
 
 function Orders() {
@@ -21,33 +21,45 @@ function Orders() {
   }, []);
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(245,245,245,0.3)', letterSpacing: '1px' }}>LOADING...</p>
+    <div style={{ minHeight: '100vh', background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#888', letterSpacing: '1px' }}>Loading...</p>
     </div>
   );
 
   return (
-    <div style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: '80px' }}>
+    <div style={{ background: '#f5f5f5', minHeight: '100vh', paddingTop: '80px' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '48px 40px' }}>
 
-        <div style={{ marginBottom: '48px' }}>
-          <p style={{ fontSize: '11px', color: '#e8ff3b', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>
+        {/* HEADER */}
+        <div style={{ marginBottom: '40px' }}>
+          <p style={{ fontSize: '12px', color: '#888', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px' }}>
             {orders.length} orders
           </p>
-          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '60px', letterSpacing: '2px', color: '#f5f5f5' }}>
+          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '56px', letterSpacing: '2px', color: '#1a1a1a' }}>
             My Orders
           </h1>
         </div>
 
+        {/* EMPTY */}
         {orders.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '80px', color: 'rgba(245,245,245,0.05)', marginBottom: '24px' }}>
+          <div style={{
+            textAlign: 'center', padding: '80px',
+            background: '#fff', borderRadius: '16px',
+            border: '1px solid #eee'
+          }}>
+            <div style={{
+              fontFamily: 'Bebas Neue, sans-serif',
+              fontSize: '64px', color: '#e0e0e0',
+              marginBottom: '24px', letterSpacing: '2px'
+            }}>
               NO ORDERS YET
             </div>
             <Link to="/products" style={{
-              display: 'inline-block', background: '#e8ff3b', color: '#0a0a0a',
+              display: 'inline-block', background: '#1a1a1a', color: '#e8ff3b',
               padding: '14px 36px', borderRadius: '8px',
-              fontSize: '13px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase',
+              fontSize: '13px', fontWeight: '700',
+              letterSpacing: '1px', textTransform: 'uppercase',
+              textDecoration: 'none'
             }}>Start Shopping</Link>
           </div>
         ) : (
@@ -57,44 +69,50 @@ function Orders() {
               const open = expanded === order.id;
               return (
                 <div key={order.id} style={{
-                  background: '#111', border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '12px', overflow: 'hidden',
+                  background: '#fff',
+                  border: '1px solid #eee',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
                   <div onClick={() => setExpanded(open ? null : order.id)}
                     style={{
                       padding: '24px 28px',
-                      display: 'grid', gridTemplateColumns: '1fr auto auto auto',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr auto auto auto',
                       gap: '24px', alignItems: 'center', cursor: 'pointer',
                     }}>
                     <div>
-                      <p style={{ fontSize: '13px', color: 'rgba(245,245,245,0.35)', marginBottom: '4px' }}>
+                      <p style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>
                         Order #{String(order.id).padStart(4, '0')} · {order.created_at}
                       </p>
-                      <p style={{ fontSize: '15px', fontWeight: '500', color: '#f5f5f5' }}>
+                      <p style={{ fontSize: '15px', fontWeight: '600', color: '#1a1a1a' }}>
                         {order.items.length} item{order.items.length > 1 ? 's' : ''}
                       </p>
                     </div>
 
                     <span style={{
                       background: s.bg, color: s.color,
-                      fontSize: '11px', fontWeight: '600',
+                      fontSize: '11px', fontWeight: '700',
                       padding: '6px 14px', borderRadius: '100px',
                       letterSpacing: '0.5px', textTransform: 'uppercase',
                     }}>{s.label}</span>
 
                     <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: '18px', fontWeight: '600', color: '#f5f5f5' }}>
+                      <p style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a' }}>
                         ₹{parseFloat(order.total_amount).toLocaleString('en-IN')}
                       </p>
                       <p style={{
                         fontSize: '11px', fontWeight: '600',
-                        color: order.payment_status === 'paid' ? '#3be87b' : '#e8a83b',
+                        color: order.payment_status === 'paid' ? '#15803d' : '#b45309',
                         textTransform: 'uppercase', marginTop: '2px',
-                      }}>{order.payment_status === 'paid' ? '✓ Paid' : 'Pending'}</p>
+                      }}>
+                        {order.payment_status === 'paid' ? '✓ Paid' : 'Pending'}
+                      </p>
                     </div>
 
                     <span style={{
-                      color: 'rgba(245,245,245,0.25)', fontSize: '18px',
+                      color: '#aaa', fontSize: '18px',
                       display: 'inline-block',
                       transition: 'transform 0.2s',
                       transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -102,26 +120,40 @@ function Orders() {
                   </div>
 
                   {open && (
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '24px 28px' }}>
+                    <div style={{ borderTop: '1px solid #f0f0f0', padding: '24px 28px', background: '#fafafa' }}>
                       {order.items.map((item, j) => (
-                        <div key={j} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <div key={j} style={{
+                          display: 'flex', justifyContent: 'space-between',
+                          marginBottom: '12px', padding: '12px 0',
+                          borderBottom: '1px solid #f0f0f0'
+                        }}>
                           <div>
-                            <p style={{ fontSize: '14px', color: '#f5f5f5', marginBottom: '2px' }}>{item.product_name}</p>
-                            <p style={{ fontSize: '12px', color: 'rgba(245,245,245,0.35)' }}>
+                            <p style={{ fontSize: '14px', color: '#1a1a1a', fontWeight: '600', marginBottom: '2px' }}>
+                              {item.product_name}
+                            </p>
+                            <p style={{ fontSize: '12px', color: '#888' }}>
                               {item.quantity} × ₹{parseFloat(item.price).toLocaleString('en-IN')}
                             </p>
                           </div>
-                          <span style={{ fontSize: '14px', fontWeight: '600', color: '#f5f5f5' }}>
+                          <span style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a1a' }}>
                             ₹{parseFloat(item.subtotal).toLocaleString('en-IN')}
                           </span>
                         </div>
                       ))}
+
                       {order.shipping_address && (
-                        <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '14px 16px', marginTop: '8px' }}>
-                          <p style={{ fontSize: '11px', color: 'rgba(245,245,245,0.3)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px' }}>
+                        <div style={{
+                          background: '#fff', borderRadius: '8px',
+                          padding: '14px 16px', marginTop: '12px',
+                          border: '1px solid #eee'
+                        }}>
+                          <p style={{
+                            fontSize: '11px', color: '#888',
+                            letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '6px'
+                          }}>
                             Delivery Address
                           </p>
-                          <p style={{ fontSize: '13px', color: 'rgba(245,245,245,0.6)', lineHeight: '1.5' }}>
+                          <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
                             {order.shipping_address}
                           </p>
                         </div>

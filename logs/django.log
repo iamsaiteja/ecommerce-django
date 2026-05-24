@@ -1,0 +1,38 @@
+INFO 2026-05-24 22:07:21,810 autoreload Watching for file changes with StatReloader
+INFO 2026-05-24 22:07:25,285 log "GET / HTTP/1.1" 200 18
+INFO 2026-05-24 23:34:03,648 autoreload Watching for file changes with StatReloader
+INFO 2026-05-24 23:42:56,431 autoreload Watching for file changes with StatReloader
+INFO 2026-05-24 23:43:20,227 log "GET / HTTP/1.1" 200 18
+WARNING 2026-05-24 23:43:20,328 log Not Found: /favicon.ico
+WARNING 2026-05-24 23:43:20,329 log "GET /favicon.ico HTTP/1.1" 404 3823
+INFO 2026-05-24 23:43:24,767 log "GET / HTTP/1.1" 200 18
+INFO 2026-05-24 23:43:26,761 log "GET / HTTP/1.1" 200 18
+INFO 2026-05-24 23:43:33,204 log "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-05-24 23:43:33,446 log "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4084
+INFO 2026-05-24 23:43:33,470 log "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2026-05-24 23:43:33,472 log "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2026-05-24 23:43:33,478 log "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2026-05-24 23:43:33,478 log "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2026-05-24 23:43:33,479 log "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2026-05-24 23:43:33,479 log "GET /static/admin/css/login.css HTTP/1.1" 304 0
+INFO 2026-05-24 23:43:33,484 log "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2026-05-25 00:34:32,084 autoreload Watching for file changes with StatReloader
+INFO 2026-05-25 00:46:43,197 autoreload Watching for file changes with StatReloader
+INFO 2026-05-25 00:46:51,947 log "GET /health/ HTTP/1.1" 200 55
+WARNING 2026-05-25 00:46:52,067 log Not Found: /favicon.ico
+WARNING 2026-05-25 00:46:52,068 log "GET /favicon.ico HTTP/1.1" 404 3973
+INFO 2026-05-25 00:47:08,927 log "GET /api/products/ HTTP/1.1" 200 9930
+INFO 2026-05-25 00:47:08,988 log "GET /static/rest_framework/css/bootstrap-tweaks.css HTTP/1.1" 200 3426
+INFO 2026-05-25 00:47:08,992 log "GET /static/rest_framework/css/prettify.css HTTP/1.1" 200 817
+INFO 2026-05-25 00:47:08,996 log "GET /static/rest_framework/css/default.css HTTP/1.1" 200 1152
+INFO 2026-05-25 00:47:08,999 log "GET /static/rest_framework/css/bootstrap.min.css HTTP/1.1" 200 121457
+INFO 2026-05-25 00:47:09,032 log "GET /static/rest_framework/js/csrf.js HTTP/1.1" 200 1793
+INFO 2026-05-25 00:47:09,032 log "GET /static/rest_framework/js/ajax-form.js HTTP/1.1" 200 3796
+INFO 2026-05-25 00:47:09,061 log "GET /static/rest_framework/js/prettify-min.js HTTP/1.1" 200 13632
+INFO 2026-05-25 00:47:09,065 log "GET /static/rest_framework/js/default.js HTTP/1.1" 200 1268
+INFO 2026-05-25 00:47:09,067 log "GET /static/rest_framework/img/grid.png HTTP/1.1" 200 1458
+INFO 2026-05-25 00:47:09,070 log "GET /static/rest_framework/js/load-ajax-form.js HTTP/1.1" 200 59
+INFO 2026-05-25 00:47:09,075 log "GET /static/rest_framework/js/bootstrap.min.js HTTP/1.1" 200 39680
+INFO 2026-05-25 00:47:09,121 log "GET /static/rest_framework/js/jquery-3.7.1.min.js HTTP/1.1" 200 87533
+INFO 2026-05-25 00:55:19,816 autoreload Watching for file changes with StatReloader
+INFO 2026-05-25 00:56:06,016 log "GET / HTTP/1.1" 200 18

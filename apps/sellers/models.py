@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 class SellerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='seller_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='seller_profile')
     shop_name = models.CharField(max_length=200)
     shop_description = models.TextField(blank=True)
     logo = models.ImageField(upload_to='sellers/', blank=True, null=True)

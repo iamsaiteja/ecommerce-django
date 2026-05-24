@@ -5,6 +5,8 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect
+from django_ratelimit.decorators import ratelimit
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -12,6 +14,7 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -42,8 +45,10 @@ def register(request):
         **tokens
     }, status=201)
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def login(request):
     from django.contrib.auth import authenticate
     username = request.data.get('username')
@@ -58,6 +63,7 @@ def login(request):
         })
     return Response({'error': 'Invalid credentials'}, status=401)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile(request):
@@ -69,7 +75,8 @@ def get_profile(request):
         'first_name': user.first_name,
         'last_name': user.last_name,
     })
-    
+
+
 def google_login_callback(request):
     user = request.user
     if user.is_authenticated:

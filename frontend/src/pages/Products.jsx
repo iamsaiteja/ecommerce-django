@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API, { getImage } from "../utils/api";
 
-/* ─── Inject fonts + global styles once ─────────────────────────────── */
 const injectStyles = () => {
   if (document.getElementById("solemate-products-style")) return;
   const style = document.createElement("style");
@@ -12,22 +11,21 @@ const injectStyles = () => {
 
     .sm-products-root {
       min-height: 100vh;
-      background: #080808;
+      background: #f5f5f5;
       font-family: 'DM Sans', sans-serif;
-      color: #fff;
+      color: #1a1a1a;
       padding: 0;
       position: relative;
       overflow-x: hidden;
     }
 
-    /* subtle grid bg */
     .sm-products-root::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,0,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,0,0.025) 1px, transparent 1px);
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
       background-size: 60px 60px;
       pointer-events: none;
       z-index: 0;
@@ -35,7 +33,6 @@ const injectStyles = () => {
 
     .sm-inner { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 0 28px 80px; }
 
-    /* ── PAGE HEADER ── */
     .sm-header {
       padding: 56px 0 36px;
       position: relative;
@@ -46,7 +43,7 @@ const injectStyles = () => {
       top: -20px; left: -8px;
       font-family: 'Bebas Neue', sans-serif;
       font-size: 180px;
-      color: rgba(255,255,0,0.04);
+      color: rgba(0,0,0,0.04);
       letter-spacing: -8px;
       pointer-events: none;
       white-space: nowrap;
@@ -56,7 +53,7 @@ const injectStyles = () => {
       font-family: 'Space Mono', monospace;
       font-size: 10px;
       letter-spacing: 4px;
-      color: #FFFF00;
+      color: #1a1a1a;
       text-transform: uppercase;
       margin-bottom: 10px;
     }
@@ -66,24 +63,24 @@ const injectStyles = () => {
       letter-spacing: 2px;
       line-height: 0.88;
       margin-bottom: 10px;
+      color: #1a1a1a;
     }
     .sm-header-title span {
-      -webkit-text-stroke: 1px rgba(255,255,255,0.25);
+      -webkit-text-stroke: 1px rgba(0,0,0,0.2);
       color: transparent;
     }
     .sm-header-sub {
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.4);
       font-size: 13px;
       letter-spacing: 1px;
     }
 
-    /* ── MARQUEE ── */
     .sm-marquee {
-      border-top: 1px solid rgba(255,255,0,0.12);
-      border-bottom: 1px solid rgba(255,255,0,0.12);
+      border-top: 1px solid rgba(0,0,0,0.08);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
       padding: 13px 0;
       overflow: hidden;
-      background: rgba(255,255,0,0.025);
+      background: rgba(0,0,0,0.02);
       margin-bottom: 40px;
     }
     .sm-marquee-track {
@@ -96,32 +93,30 @@ const injectStyles = () => {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 13px;
       letter-spacing: 4px;
-      color: rgba(255,255,255,0.25);
+      color: rgba(0,0,0,0.3);
       text-transform: uppercase;
       padding-right: 40px;
     }
-    .sm-marquee-item em { color: #FFFF00; font-style: normal; margin-right: 40px; }
+    .sm-marquee-item em { color: #1a1a1a; font-style: normal; margin-right: 40px; }
     @keyframes smMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-    /* ── AI SEARCH ── */
     .sm-search-wrap { margin-bottom: 32px; }
     .sm-search-box {
       display: flex;
       align-items: center;
-      background: rgba(255,255,255,0.035);
-      border: 1px solid rgba(255,255,0,0.18);
-      transition: border-color 0.2s, background 0.2s;
+      background: #fff;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s;
     }
-    .sm-search-box:focus-within {
-      border-color: #FFFF00;
-      background: rgba(255,255,0,0.05);
-    }
+    .sm-search-box:focus-within { border-color: #1a1a1a; }
     .sm-search-badge {
       font-family: 'Space Mono', monospace;
       font-size: 9px;
       letter-spacing: 2px;
-      color: #000;
-      background: #FFFF00;
+      color: #fff;
+      background: #1a1a1a;
       padding: 5px 10px;
       white-space: nowrap;
       flex-shrink: 0;
@@ -131,16 +126,16 @@ const injectStyles = () => {
       background: transparent;
       border: none;
       outline: none;
-      color: #fff;
+      color: #1a1a1a;
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       padding: 15px 16px;
-      caret-color: #FFFF00;
+      caret-color: #1a1a1a;
     }
-    .sm-search-input::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+    .sm-search-input::placeholder { color: rgba(0,0,0,0.3); font-style: italic; }
     .sm-search-btn {
-      background: #FFFF00;
-      color: #000;
+      background: #1a1a1a;
+      color: #e8ff3b;
       border: none;
       padding: 12px 28px;
       font-family: 'Space Mono', monospace;
@@ -152,67 +147,63 @@ const injectStyles = () => {
       transition: background 0.15s, transform 0.1s;
       flex-shrink: 0;
     }
-    .sm-search-btn:hover { background: #e6e600; }
+    .sm-search-btn:hover { background: #333; }
     .sm-search-btn:active { transform: scale(0.97); }
     .sm-search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .sm-ai-result {
       margin-top: 12px;
-      background: rgba(255,255,0,0.06);
-      border: 1px solid rgba(255,255,0,0.2);
-      border-left: 3px solid #FFFF00;
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+      border-left: 3px solid #1a1a1a;
       padding: 16px 20px;
       font-size: 14px;
       line-height: 1.7;
-      color: rgba(255,255,255,0.85);
+      color: #444;
       white-space: pre-wrap;
       animation: smFadeIn 0.3s ease;
+      border-radius: 0 8px 8px 0;
     }
     @keyframes smFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ── COUNT BAR ── */
     .sm-countbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 28px;
       padding-bottom: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid #e0e0e0;
     }
     .sm-count-text {
       font-family: 'Space Mono', monospace;
       font-size: 10px;
       letter-spacing: 2px;
-      color: rgba(255,255,255,0.3);
+      color: rgba(0,0,0,0.4);
       text-transform: uppercase;
     }
-    .sm-count-text b { color: #FFFF00; font-weight: 700; }
+    .sm-count-text b { color: #1a1a1a; font-weight: 700; }
 
-    /* ── GRID ── */
     .sm-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 2px;
+      gap: 16px;
     }
 
-    /* ── CARD ── */
     .sm-card {
-      background: #111;
+      background: #fff;
       cursor: pointer;
       position: relative;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      overflow: hidden;
       animation: smCardUp 0.5s ease both;
-      transition: transform 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
-    .sm-card:hover { z-index: 2; }
-    .sm-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border: 1px solid transparent;
-      pointer-events: none;
-      transition: border-color 0.25s;
+    .sm-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
     }
-    .sm-card:hover::after { border-color: rgba(255,255,0,0.45); }
+    .sm-card::after { display: none; }
 
     @keyframes smCardUp {
       from { opacity: 0; transform: translateY(28px); }
@@ -227,30 +218,25 @@ const injectStyles = () => {
 
     .sm-card-img-wrap {
       position: relative;
-      height: 280px;
+      height: 260px;
       overflow: hidden;
-      background: #161616;
+      background: #f8f8f8;
     }
     .sm-card-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
       padding: 16px;
-      transition: transform 0.55s cubic-bezier(.25,.46,.45,.94), filter 0.3s;
-      filter: grayscale(15%);
+      transition: transform 0.55s cubic-bezier(.25,.46,.45,.94);
     }
-    .sm-card:hover .sm-card-img {
-      transform: scale(1.07);
-      filter: grayscale(0%);
-    }
+    .sm-card:hover .sm-card-img { transform: scale(1.07); }
 
     .sm-card-num {
       position: absolute;
-      top: 12px;
-      right: 14px;
+      top: 12px; right: 14px;
       font-family: 'Bebas Neue', sans-serif;
       font-size: 52px;
-      color: rgba(255,255,255,0.05);
+      color: rgba(0,0,0,0.05);
       line-height: 1;
       pointer-events: none;
     }
@@ -258,7 +244,7 @@ const injectStyles = () => {
     .sm-card-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%);
+      background: linear-gradient(to top, rgba(0,0,0,0.06) 0%, transparent 55%);
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -269,8 +255,8 @@ const injectStyles = () => {
       bottom: 14px;
       left: 50%;
       transform: translateX(-50%) translateY(16px);
-      background: #FFFF00;
-      color: #000;
+      background: #1a1a1a;
+      color: #e8ff3b;
       border: none;
       padding: 10px 26px;
       font-family: 'Space Mono', monospace;
@@ -281,23 +267,23 @@ const injectStyles = () => {
       cursor: pointer;
       white-space: nowrap;
       opacity: 0;
+      border-radius: 6px;
       transition: opacity 0.25s, transform 0.25s;
     }
     .sm-card:hover .sm-card-cta {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
-    .sm-card-cta:hover { background: #e6e600; }
 
     .sm-card-info {
       padding: 18px 16px 16px;
-      border-top: 1px solid rgba(255,255,255,0.05);
+      border-top: 1px solid #f0f0f0;
     }
     .sm-card-brand {
       font-family: 'Space Mono', monospace;
       font-size: 9px;
       letter-spacing: 3px;
-      color: rgba(255,255,255,0.28);
+      color: rgba(0,0,0,0.3);
       text-transform: uppercase;
       margin-bottom: 4px;
     }
@@ -307,9 +293,10 @@ const injectStyles = () => {
       letter-spacing: 1px;
       line-height: 1;
       margin-bottom: 10px;
+      color: #1a1a1a;
       transition: color 0.2s;
     }
-    .sm-card:hover .sm-card-name { color: #FFFF00; }
+    .sm-card:hover .sm-card-name { color: #444; }
     .sm-card-footer {
       display: flex;
       align-items: center;
@@ -319,40 +306,41 @@ const injectStyles = () => {
       font-family: 'Space Mono', monospace;
       font-size: 13px;
       font-weight: 700;
-      color: #fff;
+      color: #1a1a1a;
     }
     .sm-card-tag {
       font-family: 'Space Mono', monospace;
       font-size: 8px;
       letter-spacing: 2px;
-      color: rgba(255,255,255,0.2);
+      color: #15803d;
+      background: #dcfce7;
+      padding: 3px 8px;
+      border-radius: 4px;
       text-transform: uppercase;
     }
 
-    /* ── EMPTY STATE ── */
     .sm-empty {
       text-align: center;
       padding: 80px 20px;
-      color: rgba(255,255,255,0.2);
+      color: rgba(0,0,0,0.2);
     }
     .sm-empty-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 48px;
       letter-spacing: 2px;
       margin-bottom: 8px;
-      color: rgba(255,255,255,0.12);
+      color: rgba(0,0,0,0.1);
     }
 
-    /* ── LOADING SKELETON ── */
     .sm-skeleton-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 2px;
+      gap: 16px;
     }
-    .sm-skeleton-card { background: #111; }
+    .sm-skeleton-card { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; }
     .sm-skeleton-img {
-      height: 280px;
-      background: linear-gradient(90deg, #161616 25%, #1f1f1f 50%, #161616 75%);
+      height: 260px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
       background-size: 400% 100%;
       animation: smShimmer 1.4s ease infinite;
     }
@@ -360,7 +348,7 @@ const injectStyles = () => {
     .sm-skeleton-line {
       height: 10px;
       border-radius: 2px;
-      background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
       background-size: 400% 100%;
       animation: smShimmer 1.4s ease infinite;
       margin-bottom: 10px;
@@ -373,7 +361,6 @@ const injectStyles = () => {
   document.head.appendChild(style);
 };
 
-/* ── Helper: guess brand from name ──────────────────────────────────── */
 const getBrand = (name = "") => {
   const n = name.toLowerCase();
   if (n.includes("nike")) return "Nike";
@@ -384,172 +371,138 @@ const getBrand = (name = "") => {
   return "Solemate";
 };
 
-/* ── Marquee content ─────────────────────────────────────────────────── */
 const MARQUEE_ITEMS = [
   "New Drop", "Premium Kicks", "Free Shipping ₹999+",
   "Authentic Brands", "Heat Certified", "Zero Fake",
 ];
 const MARQUEE_DOUBLED = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
 
-/* ════════════════════════════════════════════════════════════════════ */
 function Products() {
   const navigate = useNavigate();
-  const [products, setProducts]   = useState([]);
-  const [query, setQuery]         = useState("");
-  const [aiResult, setAiResult]   = useState("");
-  const [loading, setLoading]     = useState(false);
-  const [fetching, setFetching]   = useState(true);
+  const [products, setProducts] = useState([]);
+  const [query, setQuery] = useState("");
+  const [aiResult, setAiResult] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     injectStyles();
     API.get("/products/")
       .then((res) => setProducts(res.data))
-      .catch((err) => console.error("Error:", err))
-      .finally(() => setFetching(false));
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleAiSearch = async () => {
+  const handleSearch = async () => {
     if (!query.trim()) return;
-    setLoading(true);
+    setAiLoading(true);
     setAiResult("");
     try {
-      const res = await API.post("/products/ai-search/", { query });
-      setAiResult(res.data.suggestion);
-    } catch (err) {
-      setAiResult("Error: " + (err.response?.data?.error || "Something went wrong"));
+      const res = await API.post("/ai-search/", { query });
+      setAiResult(res.data.result);
+    } catch {
+      setAiResult("Something went wrong. Please try again.");
+    } finally {
+      setAiLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleAiSearch();
-  };
+  const filtered = products.filter((p) =>
+    p.name.toLowerCase().includes(query.toLowerCase())
+  );
 
-  /* ── RENDER ─────────────────────────────────────────────────────── */
   return (
     <div className="sm-products-root">
       <div className="sm-inner">
-
-        {/* ── PAGE HEADER ── */}
         <div className="sm-header">
-          <div className="sm-header-ghost">KICKS</div>
-          <div className="sm-header-label">— SS 2025 Collection</div>
-          <h1 className="sm-header-title">
-            ALL <span>DROPS</span>
-          </h1>
-          <p className="sm-header-sub">Handpicked. Heat certified. Zero fake.</p>
+          <div className="sm-header-ghost">SOLEMATE</div>
+          <div className="sm-header-label">— Collection 2025</div>
+          <div className="sm-header-title">ALL <span>KICKS</span></div>
+          <div className="sm-header-sub">Premium footwear, zero compromises.</div>
         </div>
 
-        {/* ── MARQUEE ── */}
         <div className="sm-marquee">
           <div className="sm-marquee-track">
             {MARQUEE_DOUBLED.map((item, i) => (
-              <span className="sm-marquee-item" key={i}>
-                {item}<em>✦</em>
-              </span>
+              <span className="sm-marquee-item" key={i}><em>✦</em>{item}</span>
             ))}
           </div>
         </div>
 
-        {/* ── AI SEARCH ── */}
         <div className="sm-search-wrap">
           <div className="sm-search-box">
-            <span className="sm-search-badge">⚡ AI SEARCH</span>
+            <span className="sm-search-badge">AI SEARCH</span>
             <input
               className="sm-search-input"
-              type="text"
+              placeholder="e.g. white sneakers under ₹3000..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="e.g. comfortable running shoes under ₹5000, red Nike, latest drop..."
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
             <button
               className="sm-search-btn"
-              onClick={handleAiSearch}
-              disabled={loading}
+              onClick={handleSearch}
+              disabled={aiLoading}
             >
-              {loading ? "..." : "Ask AI →"}
+              {aiLoading ? "..." : "SEARCH"}
             </button>
           </div>
-          {aiResult && (
-            <div className="sm-ai-result">{aiResult}</div>
-          )}
+          {aiResult && <div className="sm-ai-result">{aiResult}</div>}
         </div>
 
-        {/* ── COUNT BAR ── */}
         <div className="sm-countbar">
           <span className="sm-count-text">
-            <b>{fetching ? "—" : products.length.toString().padStart(2, "0")}</b> Products Found
+            <b>{filtered.length}</b> products found
           </span>
         </div>
 
-        {/* ── SKELETON ── */}
-        {fetching && (
+        {loading ? (
           <div className="sm-skeleton-grid">
-            {[1, 2, 3].map((n) => (
-              <div className="sm-skeleton-card" key={n}>
+            {[...Array(6)].map((_, i) => (
+              <div className="sm-skeleton-card" key={i}>
                 <div className="sm-skeleton-img" />
                 <div className="sm-skeleton-info">
                   <div className="sm-skeleton-line" style={{ width: "40%" }} />
                   <div className="sm-skeleton-line" style={{ width: "70%" }} />
-                  <div className="sm-skeleton-line" style={{ width: "30%" }} />
                 </div>
               </div>
             ))}
           </div>
-        )}
-
-        {/* ── PRODUCTS GRID ── */}
-        {!fetching && products.length > 0 && (
+        ) : filtered.length === 0 ? (
+          <div className="sm-empty">
+            <div className="sm-empty-title">NO KICKS</div>
+            <div>No products match your search.</div>
+          </div>
+        ) : (
           <div className="sm-grid">
-            {products.map((p, idx) => (
+            {filtered.map((product, i) => (
               <div
                 className="sm-card"
-                key={p.id}
-                onClick={() => navigate(`/products/${p.id}`)}
+                key={product.id}
+                onClick={() => navigate(`/products/${product.id}`)}
               >
                 <div className="sm-card-img-wrap">
                   <img
                     className="sm-card-img"
-                    src={getImage(p.image)}
-                    alt={p.name}
+                    src={getImage(product.image)}
+                    alt={product.name}
                   />
-                  <div className="sm-card-num">
-                    {String(idx + 1).padStart(2, "0")}
-                  </div>
+                  <span className="sm-card-num">0{i + 1}</span>
                   <div className="sm-card-overlay" />
-                  <button
-                    className="sm-card-cta"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/products/${p.id}`);
-                    }}
-                  >
-                    View Details →
-                  </button>
+                  <button className="sm-card-cta">VIEW DETAILS</button>
                 </div>
-
                 <div className="sm-card-info">
-                  <div className="sm-card-brand">{getBrand(p.name)}</div>
-                  <div className="sm-card-name">{p.name}</div>
+                  <div className="sm-card-brand">{getBrand(product.name)}</div>
+                  <div className="sm-card-name">{product.name}</div>
                   <div className="sm-card-footer">
-                    <span className="sm-card-price">₹{p.price}</span>
-                    <span className="sm-card-tag">In Stock</span>
+                    <span className="sm-card-price">₹{product.price}</span>
+                    <span className="sm-card-tag">IN STOCK</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-
-        {/* ── EMPTY STATE ── */}
-        {!fetching && products.length === 0 && (
-          <div className="sm-empty">
-            <div className="sm-empty-title">No Drops Yet</div>
-            <p>Products will appear here once added from the admin panel.</p>
-          </div>
-        )}
-
       </div>
     </div>
   );
