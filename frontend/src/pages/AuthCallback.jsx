@@ -16,7 +16,7 @@ const AuthCallback = () => {
     } else {
       navigate("/login");
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div style={{ color: "white", textAlign: "center", marginTop: "100px" }}>
