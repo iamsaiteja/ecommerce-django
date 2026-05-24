@@ -1,19 +1,16 @@
 from django.shortcuts import redirect
-from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 
 def google_callback(request):
     user = request.user
 
-    # User logged in kaalekapothe → login ki back
+    # User login kaalekapothe — login page ki back (tokens lekundane)
     if not user.is_authenticated:
-        return redirect(
-            f"https://solemate01.vercel.app/login"
-            f"?access={access}&refresh={refresh_token}"
-        )
-    # Real JWT tokens generate cheyyali ← idi missing undi meeru dggara
+        return redirect("https://solemate01.vercel.app/login")
+
+    # Tokens generate cheyyandi
     refresh = RefreshToken.for_user(user)
-    access  = str(refresh.access_token)
+    access = str(refresh.access_token)
     refresh_token = str(refresh)
 
     # Tokens tho frontend ki redirect
