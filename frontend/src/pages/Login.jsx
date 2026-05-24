@@ -21,6 +21,8 @@ function Login() {
 
         // URL nunchi tokens tholaginchadaniki
         window.history.replaceState({}, document.title, "/");
+
+        window.location.href = "/products";
         
         // Direct ga home page leda products page ki velladaniki
         navigate("/"); 
