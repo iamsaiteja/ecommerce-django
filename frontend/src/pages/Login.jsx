@@ -9,23 +9,29 @@ function Login() {
   const navigate = useNavigate();
 
   
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const access = params.get("access");
-    const refresh = params.get("refresh");
+ useEffect(() => {
+    // URL lo ? leda # renditlonu tokens unna vethikela code:
+    let searchParams = new URLSearchParams(window.location.search);
+    
+    // Oka vela Django # pampisthe, danni ? ga marchesi chaduvuthundi:
+    if (window.location.hash) {
+        const hashText = window.location.hash.substring(1); // # theseyadaniki
+        searchParams = new URLSearchParams(hashText);
+    }
+
+    const access = searchParams.get("access");
+    const refresh = searchParams.get("refresh");
 
     if (access && refresh) {
         localStorage.setItem("access", access);
         localStorage.setItem("refresh", refresh);
         localStorage.setItem("username", "GoogleUser");
 
-        // URL nunchi tokens tholaginchadaniki
-        window.history.replaceState({}, document.title, "/");
-
-        window.location.href = "/products";
+        // URL ni clean cheyadanki
+        window.history.replaceState({}, document.title, "/login");
         
-        // Direct ga home page leda products page ki velladaniki
-        navigate("/"); 
+        // Refresh thoti direct ga products page ki velladaniki
+        window.location.href = "/products"; 
     }
 }, [navigate]);
 
