@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://solemate.servecounterstrike.com";
+const BASE_URL =  "http://localhost:8000";
 
 axios.defaults.withCredentials = true;
 

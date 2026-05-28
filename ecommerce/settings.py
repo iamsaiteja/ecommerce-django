@@ -28,6 +28,7 @@ SECRET_KEY = 'your-secret-key-change-this-in-production'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'solemate.servecounterstrike.com',
     "localhost",
     "127.0.0.1",
     "100.56.17.207",
