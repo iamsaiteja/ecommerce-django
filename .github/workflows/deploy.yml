@@ -39,3 +39,4 @@ jobs:
             sudo systemctl restart nginx
             sudo certbot --nginx -d solemate.servecounterstrike.com --non-interactive --agree-tos -m tejayadav872@gmail.com --keep-until-expiring
             sudo systemctl restart gunicorn
+            echo "from django.contrib.auth import get_user_model; U = get_user_model(); U.objects.filter(username='admin').exists() or U.objects.create_superuser('admin', 'tejayadav872@gmail.com', 'Admin@1234')" | python manage.py shell
