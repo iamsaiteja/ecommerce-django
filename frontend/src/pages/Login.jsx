@@ -68,8 +68,8 @@ function Login() {
   // ================= GOOGLE LOGIN =================
   const handleGoogleLogin = () => {
 
-    window.location.href =
-      "https://solemate.servecounterstrike.com/accounts/google/login/";
+    const base = process.env.REACT_APP_API_URL || "https://solemate.servecounterstrike.com";
+    window.location.href = `${base}/accounts/google/login/`;
   };
 
   return (
