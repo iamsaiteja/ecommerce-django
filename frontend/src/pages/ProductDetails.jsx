@@ -166,7 +166,19 @@ function ProductDetails() {
             justifyContent: "center",
           }}
         >
-
+         <div
+           style={{
+             display: "inline-block",
+             background: "#111",
+             color: "#fff",
+             padding: "6px 12px",
+             borderRadius: "999px",
+             fontSize: "12px",
+             marginBottom: "12px",
+            }}
+        >
+          BEST SELLER
+        </div>
           <h1
             style={{
               color: "#1a1a1a",
@@ -199,7 +211,21 @@ function ProductDetails() {
           >
             {product?.description || "No description available"}
           </p>
-
+           
+          <div style={{ marginTop: "20px" }}>
+            <ul
+              style={{
+                color: "#666",
+                lineHeight: "2",
+                paddingLeft: "20px",
+              }}
+            >
+              <li>Premium Comfort</li>
+              <li>Lightweight Design</li>
+              <li>Breathable Material</li>
+              <li>Durable Sole</li>
+            </ul>
+          </div>
           {/* SIZE */}
           <div style={{ marginBottom: "28px" }}>
 
@@ -285,9 +311,58 @@ function ProductDetails() {
               ? "Add to Cart"
               : "Select Size First"}
           </button>
-
+          
+          <div
+            style={{
+              marginTop: "24px",
+              background: "#f8f8f8",
+              padding: "18px",
+              borderRadius: "12px",
+            }}
+          >
+            <p>🚚 Free Delivery</p>
+            <p>🔄 Easy Returns</p>
+            <p>🔒 Secure Checkout</p>
+          </div>
         </div>
       </div>
+          <div
+            style={{
+              marginTop: "80px",
+            }}
+          >
+            <h2
+              style={{
+                marginBottom: "30px",
+                textAlign: "center",
+              }}
+            >
+              You May Also Like
+            </h2>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit,minmax(250px,1fr))",
+                gap: "20px",
+              }}
+            >
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: "#fff",
+                    padding: "20px",
+                    borderRadius: "12px",
+                    border: "1px solid #eee",
+                  }}
+                >
+                  Similar Product {i + 1}
+                </div>
+              ))}
+            </div>
+          </div>
     </div>
   );
 }

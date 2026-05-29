@@ -1,9 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+
+const megaMenuData = {
+  men: {
+    Featured: ["New Arrivals", "Bestsellers", "Shop All Sale", "All Conditions Gear"],
+    Shoes: ["All Shoes", "Lifestyle", "Jordan", "Running", "Basketball", "Gym & Training", "Tennis", "Skateboarding", "Sandals & Slides"],
+    Clothing: ["All Clothing", "Tops & T-Shirts", "Shorts", "Pants & Leggings", "Hoodies & Sweatshirts", "Jackets & Gilets", "Jerseys & Kits", "Jordan"],
+    "Shop By Sport": ["Running", "Basketball", "Football", "Golf", "Tennis & Pickleball", "Gym & Training", "Yoga", "Skateboarding"],
+  },
+  women: {
+    Featured: ["New Arrivals", "Bestsellers", "Shop All Sale", "All Conditions Gear"],
+    Shoes: ["All Shoes", "Lifestyle", "Running", "Training & Gym", "Tennis", "Basketball", "Jordan", "Sandals & Slides"],
+    Clothing: ["All Clothing", "Tops & T-Shirts", "Shorts", "Pants & Leggings", "Hoodies & Sweatshirts", "Sports Bras", "Skirts & Dresses", "Jordan"],
+    "Shop By Sport": ["Running", "Yoga", "Training", "Basketball", "Tennis & Pickleball", "Golf", "Gym & Training", "Skateboarding"],
+  },
+  kids: {
+    Featured: ["New Arrivals", "Bestsellers", "Back to School", "Gift Ideas"],
+    Boys: ["All Shoes", "Lifestyle", "Running", "Basketball", "Jordan", "Sandals & Slides"],
+    Girls: ["All Shoes", "Lifestyle", "Running", "Training", "Jordan", "Sandals & Slides"],
+    "Shop By Sport": ["Running", "Basketball", "Football", "Tennis", "Gym & Training", "Skateboarding"],
+  },
+  sale: {
+    "Men's Sale": ["Shoes Sale", "Clothing Sale", "Accessories Sale", "Clearance"],
+    "Women's Sale": ["Shoes Sale", "Clothing Sale", "Accessories Sale", "Clearance"],
+    "Kids' Sale": ["Shoes Sale", "Clothing Sale", "Accessories Sale", "Clearance"],
+    "Last Chance": ["Under ₹1000", "Under ₹2000", "Under ₹3000", "All Sale Items"],
+  },
+};
+
+function MegaMenu({ data, visible }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "100%",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "820px",
+        background: "#fff",
+        borderTop: "1px solid #e5e5e5",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+        padding: "32px 40px",
+        display: "grid",
+        gridTemplateColumns: `repeat(${Object.keys(data).length}, 1fr)`,
+        gap: "32px",
+        zIndex: 999,
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? "all" : "none",
+        transition: "opacity 0.18s ease",
+      }}
+    >
+      {Object.entries(data).map(([category, items]) => (
+        <div key={category}>
+          <p
+            style={{
+              fontSize: "12px",
+              fontWeight: "700",
+              color: "#111",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              marginBottom: "12px",
+            }}
+          >
+            {category}
+          </p>
+          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {items.map((item) => (
+              <li key={item} style={{ marginBottom: "8px" }}>
+                <Link
+                  to="/products"
+                  style={{
+                    fontSize: "14px",
+                    color: "#555",
+                    textDecoration: "none",
+                    transition: "color 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.target.style.color = "#111")}
+                  onMouseLeave={(e) => (e.target.style.color = "#555")}
+                >
+                  {item}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function Navbar() {
   const [user, setUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const role = localStorage.getItem("role");
@@ -11,131 +101,216 @@ function Navbar() {
   useEffect(() => {
     const token = localStorage.getItem("access");
     const username = localStorage.getItem("username");
-    if (token) {
-      setUser(username || "User");
-    } else {
-      setUser(null);
-    }
+    setUser(token ? username || "User" : null);
   }, [location]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const logout = () => {
     localStorage.clear();
     setUser(null);
-    navigate('/login');
+    navigate("/login");
   };
 
-  const isLoginPage = location.pathname === '/login' || location.pathname === '/register';
+  const isLoginPage =
+    location.pathname === "/login" || location.pathname === "/register";
 
-  const linkStyle = (path) => ({
-    fontSize: '13px',
-    fontWeight: '600',
-    letterSpacing: '0.5px',
-    color: location.pathname === path ? '#1a1a1a' : '#666',
-    textTransform: 'uppercase',
-    textDecoration: 'none',
-    borderBottom: location.pathname === path ? '2px solid #1a1a1a' : '2px solid transparent',
-    paddingBottom: '2px'
-  });
+  const navLinkStyle = (paths) => {
+    const isActive = Array.isArray(paths)
+      ? paths.includes(location.pathname)
+      : location.pathname === paths;
+    return {
+      fontSize: "13px",
+      fontWeight: "600",
+      color: isActive ? "#111" : "#444",
+      textDecoration: "none",
+      letterSpacing: "0.02em",
+      padding: "4px 0",
+      borderBottom: isActive ? "2px solid #111" : "2px solid transparent",
+      transition: "color 0.15s, border-color 0.15s",
+    };
+  };
+
+  const megaItems = [
+    { key: "men", label: "Men", path: "/products?category=men" },
+    { key: "women", label: "Women", path: "/products?category=women" },
+    { key: "kids", label: "Kids", path: "/products?category=kids" },
+    { key: "sale", label: "Sale", path: "/products?sale=true" },
+  ];
 
   return (
-    <nav style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0,
-      zIndex: 1000,
-      padding: '0 40px',
-      height: '64px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      transition: 'all 0.3s ease',
-      background: isLoginPage
-        ? 'transparent'
-        : scrolled
-          ? 'rgba(255,255,255,0.98)'
-          : '#ffffff',
-      backdropFilter: scrolled && !isLoginPage ? 'blur(20px)' : 'none',
-      borderBottom: isLoginPage
-        ? '1px solid transparent'
-        : '1px solid #eee',
-      boxShadow: scrolled && !isLoginPage ? '0 2px 20px rgba(0,0,0,0.06)' : 'none'
-    }}>
+    <>
+      {!isLoginPage && (
+        <div
+          style={{
+            background: "#111",
+            color: "#fff",
+            textAlign: "center",
+            padding: "8px",
+            fontSize: "12px",
+            fontWeight: "600",
+            position: "fixed",
+            top: 0,
+            width: "100%",
+            zIndex: 1001,
+          }}
+        >
+          🔥 UP TO 40% OFF ON PREMIUM SNEAKERS
+        </div>
+      )}
 
-      <Link to="/" style={{
-        fontFamily: 'Bebas Neue, sans-serif',
-        fontSize: '26px',
-        letterSpacing: '3px',
-        color: isLoginPage ? 'transparent' : '#1a1a1a',
-        pointerEvents: isLoginPage ? 'none' : 'auto',
-        textDecoration: 'none'
-      }}>
-        SoleMate
-      </Link>
+      <nav
+        onMouseLeave={() => setActiveMenu(null)}
+        style={{
+          position: "fixed",
+          top: isLoginPage ? 0 : 34,
+          left: 0,
+          right: 0,
+          height: "60px",
+          zIndex: 1000,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 40px",
+          background: "#fff",
+          borderBottom: "1px solid #eee",
+          boxShadow: scrolled ? "0 4px 12px rgba(0,0,0,0.08)" : "none",
+        }}
+      >
+        {/* Logo */}
+        <Link
+          to="/"
+          style={{
+            fontFamily: "Bebas Neue, sans-serif",
+            fontSize: "28px",
+            letterSpacing: "3px",
+            color: "#111",
+            textDecoration: "none",
+            flexShrink: 0,
+          }}
+        >
+          SOLEMATE
+        </Link>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-
+        {/* Center Nav Links */}
         {!isLoginPage && (
-          <>
-            <Link to="/" style={linkStyle('/')}>Home</Link>
-            <Link to="/products" style={linkStyle('/products')}>Products</Link>
-          </>
+          <div
+            style={{
+              display: "flex",
+              gap: "28px",
+              alignItems: "center",
+              height: "100%",
+              position: "relative",
+            }}
+          >
+            <Link
+              to="/"
+              style={navLinkStyle("/")}
+              onMouseEnter={() => setActiveMenu(null)}
+            >
+              Home
+            </Link>
+
+            <Link
+              to="/products"
+              style={navLinkStyle("/products")}
+              onMouseEnter={() => setActiveMenu(null)}
+            >
+              Products
+            </Link>
+
+            {megaItems.map(({ key, label, path }) => (
+              <div
+                key={key}
+                style={{ position: "relative", height: "100%", display: "flex", alignItems: "center" }}
+                onMouseEnter={() => setActiveMenu(key)}
+              >
+                <Link
+                  to={path}
+                  style={{
+                    ...navLinkStyle("/products"),
+                    color: activeMenu === key ? "#111" : "#444",
+                    borderBottom: activeMenu === key ? "2px solid #111" : "2px solid transparent",
+                  }}
+                >
+                  {label}
+                </Link>
+                <MegaMenu data={megaMenuData[key]} visible={activeMenu === key} />
+              </div>
+            ))}
+          </div>
         )}
 
-        {user ? (
-          <>
-            <Link to="/cart" style={linkStyle('/cart')}>Cart</Link>
-            <Link to="/orders" style={linkStyle('/orders')}>Orders</Link>
-
-            {role === "seller" && (
-              <Link to="/seller-dashboard" style={linkStyle('/seller-dashboard')}>Seller</Link>
+        {/* Right Side */}
+        {!isLoginPage && (
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            {user ? (
+              <>
+                <Link to="/cart" style={navLinkStyle("/cart")}>
+                  Cart
+                </Link>
+                <Link to="/orders" style={navLinkStyle("/orders")}>
+                  Orders
+                </Link>
+                {role === "seller" && (
+                  <Link to="/seller" style={navLinkStyle("/seller")}>
+                    Seller
+                  </Link>
+                )}
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    color: "#111",
+                  }}
+                >
+                  {user}
+                </span>
+                <button
+                  onClick={logout}
+                  style={{
+                    background: "#111",
+                    color: "#fff",
+                    border: "none",
+                    padding: "9px 18px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                  }}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" style={navLinkStyle("/login")}>
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  style={{
+                    background: "#111",
+                    color: "#e8ff3b",
+                    padding: "9px 18px",
+                    borderRadius: "8px",
+                    textDecoration: "none",
+                    fontWeight: "700",
+                    fontSize: "13px",
+                  }}
+                >
+                  Register
+                </Link>
+              </>
             )}
-
-            <span style={{ fontSize: '13px', color: '#888', fontWeight: '500' }}>
-              {user}
-            </span>
-
-            <button onClick={logout} style={{
-              background: '#1a1a1a',
-              border: 'none',
-              color: '#fff',
-              padding: '8px 18px',
-              borderRadius: '6px',
-              fontSize: '12px',
-              fontWeight: '600',
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase',
-              cursor: 'pointer'
-            }}>
-              Logout
-            </button>
-          </>
-        ) : (
-          !isLoginPage && (
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <Link to="/login" style={linkStyle('/login')}>Login</Link>
-              <Link to="/register" style={{
-                background: '#1a1a1a',
-                color: '#e8ff3b',
-                padding: '8px 20px',
-                borderRadius: '6px',
-                fontSize: '12px',
-                fontWeight: '700',
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase',
-                textDecoration: 'none'
-              }}>
-                Register
-              </Link>
-            </div>
-          )
+          </div>
         )}
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }
 
