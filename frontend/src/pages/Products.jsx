@@ -404,7 +404,7 @@ function Products() {
     try {
         console.log("API CALL START");
 
-        const res = await API.post("/ai-search/", { query });
+        const res = await API.post("/products/ai-search/", { query });
 
         console.log("API RESPONSE", res);
 
