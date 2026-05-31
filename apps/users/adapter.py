@@ -18,6 +18,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         if "localhost" in host or "127.0.0.1" in host:
             base_url = "http://localhost:3000"
         else:
-            base_url = "https://solemate01.vercel.app"
+            base_url = "https://ecommerce-django-two.vercel.app"
 
         return f"{base_url}/login?access={access}&refresh={str(refresh)}"

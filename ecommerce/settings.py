@@ -213,8 +213,8 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
-LOGIN_REDIRECT_URL = 'http://localhost:3000/auth/google/callback'
-LOGOUT_REDIRECT_URL = "https://solemate01.vercel.app"
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = "https://ecommerce-django-two.vercel.app"
 
 
 

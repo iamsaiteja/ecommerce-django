@@ -75,5 +75,5 @@ def google_callback(request):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
-    frontend_url = "https://solemate01.vercel.app/auth/callback"
+    frontend_url = "https://ecommerce-django-two.vercel.app"
     return redirect(f"{frontend_url}?access={access_token}&refresh={refresh_token}")
