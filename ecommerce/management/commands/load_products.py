@@ -44,7 +44,7 @@ class Command(BaseCommand):
                     price=row['price'],
                     stock=row['stock_quantity'],
                     category=category,
-                    image=row['image_url'],
+                    image=row.get('image_url', '').strip(),
                     
                     is_featured=row['is_featured'] == 'True',
                 )
