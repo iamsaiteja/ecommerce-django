@@ -3,6 +3,21 @@
 > A full-stack multi-seller e-commerce marketplace built with Django + React. Razorpay payments, JWT authentication, Google OAuth, seller dashboards, and production deployment on AWS EC2.
 
 **🔗 Live Demo:** [solemate.servecounterstrike.com](https://solemate.servecounterstrike.com)
+# 👟 SoleMate
+
+Multi-vendor E-commerce Platform built using Django REST Framework and React.
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://ecommerce-django-two.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/iamsaiteja/ecommerce-django)
+
+[![Python](https://img.shields.io/badge/Python-3.10+-blue)]()
+[![Django](https://img.shields.io/badge/Django-Backend-green)]()
+[![DRF](https://img.shields.io/badge/REST-API-red)]()
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB)]()
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)]()
+[![AWS EC2](https://img.shields.io/badge/AWS-EC2-orange)]()
+[![Razorpay](https://img.shields.io/badge/Razorpay-Payments-blue)]()
+[![Google OAuth](https://img.shields.io/badge/Google-OAuth-red)]()
 
 ---
 
