@@ -1,4 +1,4 @@
-# SoleMate 👟
+# SOLEMATE 👟
 
 > A full-stack multi-seller e-commerce marketplace built with Django + React. Razorpay payments, JWT authentication, Google OAuth, seller dashboards, and production deployment on AWS EC2.
 
