@@ -18,7 +18,7 @@ def product_list(request):
             'price': str(p.price),
             'stock': p.stock,
             'category': p.category.name if p.category else None,
-            'image': p.image.url if p.image else None,
+            'image': f"/media/{p.image}" if p.image else None,
         })
     return Response(data)
 
@@ -35,7 +35,7 @@ def product_detail(request, pk):
             'price': str(p.price),
             'stock': p.stock,
             'category': p.category.name if p.category else None,
-            'image': p.image.url if p.image else None,
+            'image': f"/media/{p.image}" if p.image else None,
             'reviews': reviews,
         }
         return Response(data)
