@@ -224,10 +224,10 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
-GEMINI_API_KEY = 'AIzaSyAqdYr8FauQSWWQkYy8he46ZaxOC-ciGIw'
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
-SOCIALACCOUNT_ADAPTER = "apps.users.adapter.CustomSocialAccountAdapter"
+ACCOUNT_ADAPTER = "apps.users.adapter.CustomAccountAdapter"
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'SoleMate API',
@@ -315,3 +315,9 @@ else:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    
+    
+FRONTEND_URL = os.getenv(
+    "FRONTEND_URL",
+    "http://localhost:3000"
+)

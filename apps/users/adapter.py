@@ -1,15 +1,15 @@
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.account.adapter import DefaultAccountAdapter
 from rest_framework_simplejwt.tokens import RefreshToken
-import os
+from django.conf import settings
 
-class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+
+class CustomAccountAdapter(DefaultAccountAdapter):
 
     def get_login_redirect_url(self, request):
-        print("🔥 CUSTOM ADAPTER RUNNING 🔥")
+        print("🔥 CUSTOM ACCOUNT ADAPTER RUNNING 🔥")
 
         user = request.user
         refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
 
-        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
-        return f"{frontend_url}/login?access={access}&refresh={str(refresh)}"
+        return f"{settings.FRONTEND_URL}/login?access={access}&refresh={str(refresh)}"
