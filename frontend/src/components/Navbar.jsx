@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useIsMobile from "../utils/useIsMobile";
+import { useTheme } from "../context/ThemeContext";
 
 const megaMenuData = {
   men: {
@@ -28,7 +29,7 @@ const megaMenuData = {
   },
 };
 
-function MegaMenu({ data, visible }) {
+function MegaMenu({ data, visible, dark }) {
   return (
     <div
       style={{
@@ -37,9 +38,9 @@ function MegaMenu({ data, visible }) {
         left: "50%",
         transform: "translateX(-50%)",
         width: "1000px",
-        background: "#fff",
-        borderTop: "1px solid #e5e5e5",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+        background: dark ? "#18181b" : "#fff",
+        borderTop: dark ? "1px solid #2a2a2e" : "1px solid #e5e5e5",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
         padding: "40px 60px",
         display: "grid",
         gridTemplateColumns: `repeat(${Object.keys(data).length}, 1fr)`,
@@ -56,7 +57,7 @@ function MegaMenu({ data, visible }) {
             style={{
               fontSize: "12px",
               fontWeight: "700",
-              color: "#111",
+              color: dark ? "#f4f4f5" : "#111",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               marginBottom: "12px",
@@ -69,9 +70,9 @@ function MegaMenu({ data, visible }) {
               <li key={item} style={{ marginBottom: "8px" }}>
                 <Link
                   to={`/products?category=${encodeURIComponent(item.toLowerCase())}`}
-                  style={{ fontSize: "14px", color: "#555", textDecoration: "none", transition: "color 0.15s" }}
-                  onMouseEnter={(e) => (e.target.style.color = "#111")}
-                  onMouseLeave={(e) => (e.target.style.color = "#555")}
+                  style={{ fontSize: "14px", color: dark ? "#9a9aa2" : "#555", textDecoration: "none", transition: "color 0.15s" }}
+                  onMouseEnter={(e) => (e.target.style.color = dark ? "#fff" : "#111")}
+                  onMouseLeave={(e) => (e.target.style.color = dark ? "#9a9aa2" : "#555")}
                 >
                   {item}
                 </Link>
@@ -89,12 +90,22 @@ function Navbar() {
   const [email, setEmail] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
-  const [menuOpen, setMenuOpen] = useState(false); // mobile menu open/close
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
   const role = localStorage.getItem("role");
+
+  // THEME — dark na light na
+  const themeCtx = useTheme() || {};
+  const dark = themeCtx.resolvedTheme === "dark";
+
+  // theme batti navbar colors
+  const navBg = dark ? "#18181b" : "#fff";
+  const navText = dark ? "#f4f4f5" : "#111";
+  const navMuted = dark ? "#9a9aa2" : "#444";
+  const navBorder = dark ? "#2a2a2e" : "#eee";
 
   useEffect(() => {
     const token = localStorage.getItem("access");
@@ -110,7 +121,6 @@ function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // page maaripoyinappudu mobile menu auto close
   useEffect(() => {
     setMenuOpen(false);
   }, [location]);
@@ -132,11 +142,11 @@ function Navbar() {
     return {
       fontSize: "13px",
       fontWeight: "600",
-      color: isActive ? "#111" : "#444",
+      color: isActive ? navText : navMuted,
       textDecoration: "none",
       letterSpacing: "0.02em",
       padding: "4px 0",
-      borderBottom: isActive ? "2px solid #111" : "2px solid transparent",
+      borderBottom: isActive ? `2px solid ${navText}` : "2px solid transparent",
       transition: "color 0.15s, border-color 0.15s",
     };
   };
@@ -148,14 +158,13 @@ function Navbar() {
     { key: "sale", label: "Sale", path: "/products?sale=true" },
   ];
 
-  // mobile menu lo chupinche links style
   const mobileLink = {
     fontSize: "16px",
     fontWeight: "600",
-    color: "#111",
+    color: navText,
     textDecoration: "none",
     padding: "14px 0",
-    borderBottom: "1px solid #eee",
+    borderBottom: `1px solid ${navBorder}`,
     display: "block",
   };
 
@@ -194,9 +203,10 @@ function Navbar() {
           justifyContent: "space-between",
           alignItems: "center",
           padding: isMobile ? "0 20px" : "0 40px",
-          background: "#fff",
-          borderBottom: "1px solid #eee",
-          boxShadow: scrolled ? "0 4px 12px rgba(0,0,0,0.08)" : "none",
+          background: navBg,
+          borderBottom: `1px solid ${navBorder}`,
+          boxShadow: scrolled ? "0 4px 12px rgba(0,0,0,0.18)" : "none",
+          transition: "background .3s ease, border-color .3s ease",
         }}
       >
         {/* LOGO */}
@@ -206,7 +216,7 @@ function Navbar() {
             fontFamily: "Bebas Neue, sans-serif",
             fontSize: "28px",
             letterSpacing: "3px",
-            color: "#111",
+            color: navText,
             textDecoration: "none",
             flexShrink: 0,
           }}
@@ -233,13 +243,13 @@ function Navbar() {
                   to={path}
                   style={{
                     ...navLinkStyle("/products"),
-                    color: activeMenu === key ? "#111" : "#444",
-                    borderBottom: activeMenu === key ? "2px solid #111" : "2px solid transparent",
+                    color: activeMenu === key ? navText : navMuted,
+                    borderBottom: activeMenu === key ? `2px solid ${navText}` : "2px solid transparent",
                   }}
                 >
                   {label}
                 </Link>
-                <MegaMenu data={megaMenuData[key]} visible={activeMenu === key} />
+                <MegaMenu data={megaMenuData[key]} visible={activeMenu === key} dark={dark} />
               </div>
             ))}
           </div>
@@ -248,6 +258,8 @@ function Navbar() {
         {/* DESKTOP RIGHT SIDE */}
         {!isMobile && !isLoginPage && (
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            {/* settings gear */}
+            <Link to="/settings" aria-label="Settings" style={{ ...navLinkStyle("/settings"), fontSize: "18px" }}>⚙</Link>
             {user ? (
               <>
                 <Link to="/cart" style={navLinkStyle("/cart")}>Cart</Link>
@@ -258,12 +270,12 @@ function Navbar() {
                 )}
                 {/* USER NAME + EMAIL */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.1 }}>
-                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#111" }}>{user}</span>
-                  {email && <span style={{ fontSize: "11px", color: "#888" }}>{email}</span>}
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: navText }}>{user}</span>
+                  {email && <span style={{ fontSize: "11px", color: navMuted }}>{email}</span>}
                 </div>
                 <button
                   onClick={logout}
-                  style={{ background: "#111", color: "#fff", border: "none", padding: "9px 18px", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}
+                  style={{ background: dark ? "#e8ff3b" : "#111", color: dark ? "#1a1a1a" : "#fff", border: "none", padding: "9px 18px", borderRadius: "8px", cursor: "pointer", fontSize: "13px", fontWeight: "700" }}
                 >
                   Logout
                 </button>
@@ -297,10 +309,9 @@ function Navbar() {
               gap: "5px",
             }}
           >
-            {/* 3 geethalu - open aithe X laaga marustundi */}
-            <span style={{ width: "24px", height: "2px", background: "#111", transition: "0.2s", transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
-            <span style={{ width: "24px", height: "2px", background: "#111", transition: "0.2s", opacity: menuOpen ? 0 : 1 }} />
-            <span style={{ width: "24px", height: "2px", background: "#111", transition: "0.2s", transform: menuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none" }} />
+            <span style={{ width: "24px", height: "2px", background: navText, transition: "0.2s", transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
+            <span style={{ width: "24px", height: "2px", background: navText, transition: "0.2s", opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ width: "24px", height: "2px", background: navText, transition: "0.2s", transform: menuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none" }} />
           </button>
         )}
       </nav>
@@ -310,11 +321,11 @@ function Navbar() {
         <div
           style={{
             position: "fixed",
-            top: 94, // banner(34) + navbar(60)
+            top: 94,
             left: 0,
             right: 0,
             bottom: 0,
-            background: "#fff",
+            background: navBg,
             zIndex: 999,
             padding: "20px 24px",
             overflowY: "auto",
@@ -326,7 +337,6 @@ function Navbar() {
             <Link key={key} to={path} style={mobileLink}>{label}</Link>
           ))}
 
-          {/* divider */}
           <div style={{ height: "16px" }} />
 
           {user ? (
@@ -334,21 +344,21 @@ function Navbar() {
               <Link to="/cart" style={mobileLink}>Cart</Link>
               <Link to="/wishlist" style={mobileLink}>Wishlist</Link>
               <Link to="/orders" style={mobileLink}>Orders</Link>
+              <Link to="/settings" style={mobileLink}>⚙ Settings</Link>
               {role === "seller" && (
                 <Link to="/seller" style={mobileLink}>Seller</Link>
               )}
-              {/* USER NAME + EMAIL */}
-              <div style={{ padding: "14px 0", borderBottom: "1px solid #eee" }}>
-                <div style={{ fontSize: "15px", fontWeight: 700, color: "#111" }}>{user}</div>
-                {email && <div style={{ fontSize: "12px", color: "#888", marginTop: "2px" }}>{email}</div>}
+              <div style={{ padding: "14px 0", borderBottom: `1px solid ${navBorder}` }}>
+                <div style={{ fontSize: "15px", fontWeight: 700, color: navText }}>{user}</div>
+                {email && <div style={{ fontSize: "12px", color: navMuted, marginTop: "2px" }}>{email}</div>}
               </div>
               <button
                 onClick={logout}
                 style={{
                   marginTop: "20px",
                   width: "100%",
-                  background: "#111",
-                  color: "#fff",
+                  background: dark ? "#e8ff3b" : "#111",
+                  color: dark ? "#1a1a1a" : "#fff",
                   border: "none",
                   padding: "14px",
                   borderRadius: "10px",
@@ -362,6 +372,7 @@ function Navbar() {
             </>
           ) : (
             <>
+              <Link to="/settings" style={mobileLink}>⚙ Settings</Link>
               <Link to="/login" style={mobileLink}>Login</Link>
               <Link
                 to="/register"
