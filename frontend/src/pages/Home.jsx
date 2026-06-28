@@ -66,7 +66,7 @@ padding: "20px",
 >
 <h1
 style={{
-fontSize: "110px",
+fontSize: "clamp(40px, 12vw, 110px)",
 fontWeight: "900",
 letterSpacing: "6px",
 color: "#fff",
@@ -146,7 +146,7 @@ SOLEMATE </h1>
       <div key={text} style={{ textAlign: "center" }}>
         <h1
           style={{
-            fontSize: "52px",
+            fontSize: "clamp(28px, 6vw, 52px)",
             fontWeight: "900",
           }}
         >
@@ -230,7 +230,7 @@ SOLEMATE </h1>
   >
     <h2
       style={{
-        fontSize: "60px",
+        fontSize: "clamp(28px, 7vw,60pxx)",
         marginBottom: "20px",
       }}
     >
@@ -259,7 +259,7 @@ SOLEMATE </h1>
     <h2
       style={{
         textAlign: "center",
-        fontSize: "42px",
+        fontSize: "clamp(24px, 5vw, 42px)",
         marginBottom: "10px",
       }}
     >
@@ -371,7 +371,7 @@ SOLEMATE </h1>
   >
     <h2
       style={{
-        fontSize: "34px",
+        fontSize: "clamp(20px, 4vw, 34px)",
         letterSpacing: "3px",
       }}
     >

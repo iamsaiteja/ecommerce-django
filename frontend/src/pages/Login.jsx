@@ -78,6 +78,7 @@ function Login() {
       style={{
         minHeight: '100vh',
         display: 'flex',
+        flexDirection: window.innerWidth < 768 ? 'column' : 'row',
         fontFamily: "'DM Sans', sans-serif"
       }}
     >
