@@ -18,7 +18,7 @@ API.interceptors.request.use((config) => {
 
 export const getImage = (url) => {
   if (!url) {
-    return "https://via.placeholder.com/300?text=No+Image";
+    return "https://placehold.co/300x300?text=No+Image";
   }
 
   if (url.startsWith("http")) {

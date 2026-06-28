@@ -231,6 +231,28 @@ const injectStyles = () => {
     }
     .sm-card:hover .sm-card-img { transform: scale(1.07); }
 
+    /* ===== WISHLIST HEART BUTTON ===== */
+    .sm-card-heart {
+      position: absolute;
+      top: 12px; left: 12px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 19px;
+      line-height: 1;
+      z-index: 5;
+      padding: 0;
+      transition: transform 0.15s, background 0.2s, color 0.2s;
+    }
+    .sm-card-heart:hover { transform: scale(1.15); background: #fff; }
+    .sm-card-heart.liked { color: #e63946; }
+    .sm-card-heart.not-liked { color: #ccc; }
+
     .sm-card-num {
       position: absolute;
       top: 12px; right: 14px;
@@ -380,6 +402,7 @@ const MARQUEE_DOUBLED = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
 function Products() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [likedIds, setLikedIds] = useState(new Set()); // ye products like chesamo
   const [query, setQuery] = useState("");
   const [aiResult, setAiResult] = useState("");
   const [loading, setLoading] = useState(true);
@@ -393,29 +416,57 @@ function Products() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSearch = async () => {
-    console.log("SEARCH CLICKED");
+  // login unte — ye products already like chesamo backend nundi techuko
+  useEffect(() => {
+    if (!localStorage.getItem("access")) return;
+    API.get("/wishlist/ids/")
+      .then((res) => setLikedIds(new Set(res.data.product_ids)))
+      .catch((err) => console.error(err));
+  }, []);
 
+  // heart nokkithe — toggle (undte teesey, lekapothe add)
+  const toggleLike = async (e, productId) => {
+    e.stopPropagation(); // card click (detail ki vellatam) aapali
+
+    if (!localStorage.getItem("access")) {
+      navigate("/login");
+      return;
+    }
+
+    // mundu screen meeda venタने marchu (fast anipinchadaniki)
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      next.has(productId) ? next.delete(productId) : next.add(productId);
+      return next;
+    });
+
+    try {
+      await API.post("/wishlist/toggle/", { product_id: productId });
+    } catch (err) {
+      console.error(err);
+      // error aithe venక్kి revert chey
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        next.has(productId) ? next.delete(productId) : next.add(productId);
+        return next;
+      });
+    }
+  };
+
+  const handleSearch = async () => {
     if (!query.trim()) return;
 
     setAiLoading(true);
     setAiResult("");
 
     try {
-        console.log("API CALL START");
-
-        const res = await API.post("/products/ai-search/", { query });
-
-        console.log("API RESPONSE", res);
-
-        setAiResult(res.data.result);
+      const res = await API.post("/products/ai-search/", { query });
+      setAiResult(res.data.result);
     } catch (err) {
-        console.log("FULL ERROR", err);
-        console.log("ERROR RESPONSE", err.response);
-
-        setAiResult("Something went wrong. Please try again.");
+      console.log("FULL ERROR", err);
+      setAiResult("Something went wrong. Please try again.");
     } finally {
-        setAiLoading(false);
+      setAiLoading(false);
     }
   };
 
@@ -499,6 +550,13 @@ function Products() {
                     src={getImage(product.image)}
                     alt={product.name}
                   />
+                  <button
+                    className={`sm-card-heart ${likedIds.has(product.id) ? "liked" : "not-liked"}`}
+                    onClick={(e) => toggleLike(e, product.id)}
+                    aria-label="Wishlist"
+                  >
+                    {likedIds.has(product.id) ? "♥" : "♡"}
+                  </button>
                   <span className="sm-card-num">0{i + 1}</span>
                   <div className="sm-card-overlay" />
                   <button className="sm-card-cta">VIEW DETAILS</button>
