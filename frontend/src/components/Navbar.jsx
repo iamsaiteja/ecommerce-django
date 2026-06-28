@@ -7,13 +7,13 @@ const megaMenuData = {
     "NEW DROPS": ["Latest Arrivals", "Limited Editions", "Trending"],
     "SNEAKERS": ["Lifestyle", "Running", "Basketball", "Football", "Tennis", "Training", "Skateboarding"],
     "PREMIUM": ["Jordan", "Nike Air", "Adidas Originals", "Puma Select", "New Balance"],
-    "SHOP BY PRICE": ["Under ₹3000", "₹3000 - ₹7000", "₹7000+"],
+    "SHOP BY PRICE": ["Under \u20b93000", "\u20b93000 - \u20b97000", "\u20b97000+"],
   },
   women: {
     "NEW DROPS": ["Latest Arrivals", "Trending"],
     "SNEAKERS": ["Lifestyle", "Running", "Training", "Tennis", "Walking"],
     "PREMIUM": ["Nike Women", "Adidas Women", "Puma Women"],
-    "SHOP BY PRICE": ["Under ₹3000", "₹3000 - ₹7000", "₹7000+"],
+    "SHOP BY PRICE": ["Under \u20b93000", "\u20b93000 - \u20b97000", "\u20b97000+"],
   },
   kids: {
     "BOYS": ["Running", "Basketball", "Lifestyle", "School"],
@@ -24,7 +24,7 @@ const megaMenuData = {
     "MEN SALE": ["Running", "Lifestyle", "Basketball"],
     "WOMEN SALE": ["Running", "Lifestyle"],
     "KIDS SALE": ["School", "Lifestyle"],
-    "LAST CHANCE": ["Under ₹1999", "Under ₹2999", "Clearance"],
+    "LAST CHANCE": ["Under \u20b91999", "Under \u20b92999", "Clearance"],
   },
 };
 
@@ -107,7 +107,7 @@ function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // page maaripoyినప్పుడు mobile menu auto close
+  // page maaripoyinappudu mobile menu auto close
   useEffect(() => {
     setMenuOpen(false);
   }, [location]);
@@ -173,7 +173,7 @@ function Navbar() {
             zIndex: 1001,
           }}
         >
-          🔥 UP TO 40% OFF ON PREMIUM SNEAKERS
+          \ud83d\udd25 UP TO 40% OFF ON PREMIUM SNEAKERS
         </div>
       )}
 
@@ -247,9 +247,7 @@ function Navbar() {
             {user ? (
               <>
                 <Link to="/cart" style={navLinkStyle("/cart")}>Cart</Link>
-                <Link to="/cart" style={navLinkStyle("/cart")}>Cart</Link>
                 <Link to="/wishlist" style={navLinkStyle("/wishlist")}>Wishlist</Link>
-                <Link to="/orders" style={navLinkStyle("/orders")}>Orders</Link>
                 <Link to="/orders" style={navLinkStyle("/orders")}>Orders</Link>
                 {role === "seller" && (
                   <Link to="/seller" style={navLinkStyle("/seller")}>Seller</Link>
@@ -291,7 +289,7 @@ function Navbar() {
               gap: "5px",
             }}
           >
-            {/* 3 gీతలు — open aయితే X laaga marustundi */}
+            {/* 3 geethalu - open aithe X laaga marustundi */}
             <span style={{ width: "24px", height: "2px", background: "#111", transition: "0.2s", transform: menuOpen ? "rotate(45deg) translate(5px, 5px)" : "none" }} />
             <span style={{ width: "24px", height: "2px", background: "#111", transition: "0.2s", opacity: menuOpen ? 0 : 1 }} />
             <span style={{ width: "24px", height: "2px", background: "#111", transition: "0.2s", transform: menuOpen ? "rotate(-45deg) translate(5px, -5px)" : "none" }} />
@@ -326,9 +324,7 @@ function Navbar() {
           {user ? (
             <>
               <Link to="/cart" style={mobileLink}>Cart</Link>
-              <Link to="/cart" style={mobileLink}>Cart</Link>
               <Link to="/wishlist" style={mobileLink}>Wishlist</Link>
-              <Link to="/orders" style={mobileLink}>Orders</Link>
               <Link to="/orders" style={mobileLink}>Orders</Link>
               {role === "seller" && (
                 <Link to="/seller" style={mobileLink}>Seller</Link>
