@@ -259,5 +259,8 @@ else:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    
+    SESSION_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SAMESITE = 'None'
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
