@@ -1,14 +1,16 @@
+import os
+import requests
 from django.shortcuts import redirect
-from rest_framework_simplejwt.tokens import RefreshToken
-from allauth.socialaccount.models import SocialToken
-
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.http import HttpResponse
-from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
+
+User = get_user_model()
 
 
 def send_test_email(request):
-
     send_mail(
         subject='SoleMate Test Email',
         message='Email system working successfully 😍',
@@ -16,22 +18,72 @@ def send_test_email(request):
         recipient_list=['tejayadav872@gmail.com'],
         fail_silently=False,
     )
-
     return HttpResponse("Email sent successfully")
 
+
+# ====== GOOGLE LOGIN (session avasaram ledu — mobile, incognito, laptop anni devices lo work avtundi) ======
 def google_callback(request):
+    frontend = "https://ecommerce-django-two.vercel.app"
+    redirect_uri = "https://solemate.servecounterstrike.com/users/auth/google/callback/"
 
-   
-    user = request.user
+    code = request.GET.get('code')
+    if not code:
+        return redirect(f"{frontend}/login?error=no_code")
 
-    if not user.is_authenticated:
-        return redirect("https://ecommerce-django-two.vercel.app/login")
+    # 1) Google nundi vachina code ni token ki exchange chey
+    token_resp = requests.post('https://oauth2.googleapis.com/token', data={
+        'code': code,
+        'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+        'client_secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
+        'redirect_uri': redirect_uri,
+        'grant_type': 'authorization_code',
+    }, timeout=10)
 
+    if token_resp.status_code != 200:
+        return redirect(f"{frontend}/login?error=token")
+
+    google_access = token_resp.json().get('access_token')
+
+    # 2) aa token tho user email + peru techuko
+    info_resp = requests.get(
+        'https://www.googleapis.com/oauth2/v2/userinfo',
+        headers={'Authorization': f'Bearer {google_access}'},
+        timeout=10,
+    )
+    if info_resp.status_code != 200:
+        return redirect(f"{frontend}/login?error=userinfo")
+
+    info = info_resp.json()
+    email = info.get('email')
+    if not email:
+        return redirect(f"{frontend}/login?error=email")
+
+    # 3) user already unda? lekapothe kotha ga create chey
+    user = User.objects.filter(email=email).first()
+    if not user:
+        base = email.split('@')[0]
+        username = base
+        i = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base}{i}"
+            i += 1
+        user = User.objects.create(
+            username=username,
+            email=email,
+            first_name=info.get('given_name', ''),
+            last_name=info.get('family_name', ''),
+        )
+
+    # profile (role kosam) safe ga create — emaina fail aithe ignore
+    try:
+        from apps.users.models import UserProfile
+        UserProfile.objects.get_or_create(user=user)
+    except Exception:
+        pass
+
+    # 4) JWT tokens mint chesi, frontend ki tokens tho pampu
     refresh = RefreshToken.for_user(user)
-    access = str(refresh.access_token)
+    access_token = str(refresh.access_token)
     refresh_token = str(refresh)
 
-    return redirect(
-        f"https://ecommerce-django-two.vercel.app/login"
-        f"?access={access}&refresh={refresh_token}"
-    )
+    return redirect(f"{frontend}/login?access={access_token}&refresh={refresh_token}")
