@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Product
+from .models import Product, Review
 
 
 @api_view(['GET'])
@@ -27,7 +27,9 @@ def product_list(request):
 def product_detail(request, pk):
     try:
         p = Product.objects.get(id=pk, is_active=True)
-        reviews = [{'user': r.user.username, 'rating': r.rating, 'comment': r.comment} for r in p.reviews.all()]
+        reviews_qs = list(p.reviews.select_related('user').all().order_by('-created_at'))
+        reviews = [{'user': r.user.username, 'rating': r.rating, 'comment': r.comment} for r in reviews_qs]
+        avg = round(sum(r.rating for r in reviews_qs) / len(reviews_qs), 1) if reviews_qs else 0
         data = {
             'id': p.id,
             'name': p.name,
@@ -37,10 +39,41 @@ def product_detail(request, pk):
             'category': p.category.name if p.category else None,
             'image': f"/media/{p.image}" if p.image else None,
             'reviews': reviews,
+            'avg_rating': avg,
+            'review_count': len(reviews),
         }
         return Response(data)
     except Product.DoesNotExist:
         return Response({'error': 'Not found'}, status=404)
+
+
+# ====== ADD / UPDATE REVIEW (login kavali) ======
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_review(request, pk):
+    try:
+        product = Product.objects.get(id=pk)
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
+
+    try:
+        rating = int(request.data.get('rating', 0))
+    except (TypeError, ValueError):
+        rating = 0
+    comment = (request.data.get('comment') or '').strip()
+
+    if rating < 1 or rating > 5:
+        return Response({'error': 'Rating must be between 1 and 5'}, status=400)
+    if not comment:
+        return Response({'error': 'Comment required'}, status=400)
+
+    # oka user oka product ki oka review (malli pettithe update avtundi)
+    Review.objects.update_or_create(
+        product=product,
+        user=request.user,
+        defaults={'rating': rating, 'comment': comment},
+    )
+    return Response({'message': 'Review submitted'}, status=201)
 
 
 @api_view(['POST'])
